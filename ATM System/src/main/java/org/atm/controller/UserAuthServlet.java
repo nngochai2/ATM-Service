@@ -26,11 +26,21 @@ public class UserAuthServlet extends BaseServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Long cardNumber = Long.valueOf(request.getParameter("card_number"));
+        String cardNumber = request.getParameter("cardNumber");
         String pin = request.getParameter("pin");
 
+        response.setContentType("application/json");
+
+        // Validate input
+        if (cardNumber == null || pin == null || cardNumber.trim().isEmpty() || pin.trim().isEmpty()) {
+            String errorJson = "{\"success\":false,\"message\":\"Card number and PIN are required\"}";
+            response.getWriter().write(errorJson);
+            return;
+        }
+
         try {
-            if (userService.authenticate(cardNumber, pin)) {
+            Long cardNumberLong = Long.valueOf(cardNumber);
+            if (userService.authenticate(cardNumberLong, pin)) {
                 HttpSession session = request.getSession();
                 session.setAttribute("card_number", cardNumber);
                 response.sendRedirect("dashboard.jsp");

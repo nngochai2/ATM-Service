@@ -12,7 +12,7 @@
             <h2>ATM Login</h2>
         </div>
         <div class="card-body">
-            <form id="loginForm" onsubmit="return handleLogin(event)">
+            <form id="loginForm">
                 <div class="form-group">
                     <label for="cardNumber">Card Number</label>
                     <input type="text" id="cardNumber" name="cardNumber" class="form-control" required
@@ -36,35 +36,32 @@
 </div>
 
 <script>
-    function handleLogin(event) {
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const cardNumber = document.getElementById('cardNumber').value;
-        const pin = document.getElementById('pin').value;
-        const errorMessage = document.getElementById('errorMessage');
+        const formData = new FormData(this);
+        const urlEncodedData = new URLSearchParams(formData).toString();
 
         fetch('${pageContext.request.contextPath}/user/auth', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: `cardNumber=${cardnumber}&pin=${pin}`
+            body: urlEncodedData
         })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     window.location.href = '${pageContext.request.contextPath}/user/dashboard';
                 } else {
-                    errorMessage.textContent = data.message || 'Login failed. Please check your credentials.';
+                    document.getElementById('errorMessage').textContent = data.message || 'Login failed';
                 }
             })
             .catch(error => {
-                errorMessage.textContent = 'An error occurred. Please try again.';
+                document.getElementById('errorMessage').textContent = 'An error occurred';
                 console.error('Error:', error);
             });
-
-        return false;
-    }
+    });
 </script>
 </body>
 </html>
