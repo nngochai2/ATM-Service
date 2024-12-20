@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>ATM - User Login</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
 <div class="login-container">
@@ -48,7 +48,7 @@
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `cardNumber=${cardNumber}&pin=${pin}`
+            body: `cardNumber=${cardnumber}&pin=${pin}`
         })
             .then(response => response.json())
             .then(data => {
