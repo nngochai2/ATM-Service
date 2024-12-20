@@ -2,52 +2,69 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ATM System - Login</title>
+    <title>ATM - User Login</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
-    <div class="login-container">
-        <h2>Welcome to ATM System</h2>
-        <form id="loginForm" action="${pageContext.request.contextPath}/user/auth" method="post">
-            <div class="form-group">
-                <label for="cardNumber">Card Number:</label>
-                <input type="text" id="cardNumber" name="cardNumber" required>
-            </div>
-            <div class="form-group">
-                <label for="pin">PIN:</label>
-                <input type="password" id="pin" name="pin" maxlength="4" required>
-            </div>
-            <button type="submit" class="btn-primary">Login</button>
-        </form>
-        <div id="errorMessage" class="error-message"></div>
+<div class="login-container">
+    <div class="card">
+        <div class="card-header">
+            <h2>ATM Login</h2>
+        </div>
+        <div class="card-body">
+            <form id="loginForm" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <input type="text" id="cardNumber" name="cardNumber" class="form-control" required
+                           pattern="\d{10}" title="Card number must be 10 digits">
+                </div>
+
+                <div class="form-group">
+                    <label for="pin">PIN</label>
+                    <input type="password" id="pin" name="pin" class="form-control" required
+                           pattern="\d{4}" title="PIN must be 4 digits" maxlength="4">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Login</button>
+                    <a href="${pageContext.request.contextPath}/" class="btn-secondary">Back to Home</a>
+                </div>
+            </form>
+            <div id="errorMessage" class="error-message"></div>
+        </div>
     </div>
+</div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+<script>
+    function handleLogin(event) {
+        event.preventDefault();
 
-            fetch('${pageContext.request.contextPath}/user/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    'cardNumber': document.getElementById('cardNumber').value,
-                    'pin': document.getElementById('pin').value
-                })
-            })
+        const cardNumber = document.getElementById('cardNumber').value;
+        const pin = document.getElementById('pin').value;
+        const errorMessage = document.getElementById('errorMessage');
+
+        fetch('${pageContext.request.contextPath}/user/auth', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `cardNumber=${cardNumber}&pin=${pin}`
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = '${pageContext.request.contextPath}/user/dashboard.jsp';
+                    window.location.href = '${pageContext.request.contextPath}/user/dashboard';
                 } else {
-                    document.getElementById('errorMessage').textContent = data.message;
+                    errorMessage.textContent = data.message || 'Login failed. Please check your credentials.';
                 }
             })
             .catch(error => {
-                document.getElementById('errorMessage').textContent = 'An error occurred. Please try again.';
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                console.error('Error:', error);
             });
-        });
-    </script>
+
+        return false;
+    }
+</script>
 </body>
 </html>
