@@ -19,7 +19,6 @@ public class UserAuthServlet extends BaseServlet {
 
     @Override
     public void init() throws ServletException {
-        // Initialize UserService
         userService = new UserServiceImpl(new UserDAOImpl(), new TransactionDAOImpl());
     }
 
@@ -30,11 +29,11 @@ public class UserAuthServlet extends BaseServlet {
         String pin = request.getParameter("pin");
 
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
         // Validate input
         if (cardNumber == null || pin == null || cardNumber.trim().isEmpty() || pin.trim().isEmpty()) {
-            String errorJson = "{\"success\":false,\"message\":\"Card number and PIN are required\"}";
-            response.getWriter().write(errorJson);
+            sendJsonResponse(response, "{\"success\": false, \"message\": \"Card number and PIN are required\"}");
             return;
         }
 
@@ -42,15 +41,15 @@ public class UserAuthServlet extends BaseServlet {
             Long cardNumberLong = Long.valueOf(cardNumber);
             if (userService.authenticate(cardNumberLong, pin)) {
                 HttpSession session = request.getSession();
-                session.setAttribute("card_number", cardNumber);
-                response.sendRedirect("dashboard.jsp");
+                session.setAttribute("cardNumber", cardNumberLong);
+                sendJsonResponse(response, "{\"success\": true, \"message\": \"Login successful\"}");
             } else {
-                request.setAttribute("error", "Invalid credentials");
-                request.getRequestDispatcher("login.jsp").forward(request, response);
+                sendJsonResponse(response, "{\"success\": false, \"message\": \"Invalid credentials\"}");
             }
+        } catch (NumberFormatException e) {
+            sendJsonResponse(response, "{\"success\": false, \"message\": \"Invalid card number format\"}");
         } catch (ATMException e) {
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            sendJsonResponse(response, "{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
         }
     }
 }

@@ -39,26 +39,31 @@
     document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const formData = new FormData(this);
-        const urlEncodedData = new URLSearchParams(formData).toString();
+        const cardNumber = document.getElementById('cardNumber').value;
+        const pin = document.getElementById('pin').value;
 
         fetch('${pageContext.request.contextPath}/user/auth', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: urlEncodedData
+            body: 'cardNumber=' + encodeURIComponent(cardNumber) + '&pin=' + encodeURIComponent(pin)
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     window.location.href = '${pageContext.request.contextPath}/user/dashboard';
                 } else {
-                    document.getElementById('errorMessage').textContent = data.message || 'Login failed';
+                    document.getElementById('errorMessage').textContent = data.message;
                 }
             })
             .catch(error => {
-                document.getElementById('errorMessage').textContent = 'An error occurred';
+                document.getElementById('errorMessage').textContent = 'An error occurred. Please try again.';
                 console.error('Error:', error);
             });
     });
