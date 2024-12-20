@@ -30,9 +30,18 @@
             <div id="errorMessage" class="error-message"></div>
         </div>
     </div>
-
-
 </div>
+
+<script>
+    document.getElementById('loginForm').addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+
+        fetch(`${pageContext.request.contextPath}/`)
+    }
+</script>
 
 </body>
 </html>
