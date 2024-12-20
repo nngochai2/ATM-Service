@@ -7,10 +7,16 @@
 </head>
 <body>
 <div class="landing-container">
-    <h1>Welcome to ATM System</h1>
-    <div class="button-group">
-        <a href="${pageContext.request.contextPath}/WEB-INF/jsp/user/login.jsp" class="btn-primary">User Login</a>
-        <a href="${pageContext.request.contextPath}jsp/admin/login.jsp" class="btn-primary">Admin Login</a>
+    <div class="card">
+        <div class="card-header">
+            <h1>Welcome to ATM System</h1>
+        </div>
+        <div class="card-body">
+            <div class="button-group">
+                <a href="${pageContext.request.contextPath}/login/user" class="btn-primary">User Login</a>
+                <a href="${pageContext.request.contextPath}/login/admin" class="btn-primary">Admin Login</a>
+            </div>
+        </div>
     </div>
 </div>
 </body>

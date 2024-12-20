@@ -10,7 +10,7 @@
     <!-- Resource mapping -->
     <servlet-mapping>
         <servlet-name>default</servlet-name>
-        <url-pattern>/resources/*</url-pattern>
+        <url-pattern>/webapp/*</url-pattern>
     </servlet-mapping>
 
     <!-- Welcome File -->
