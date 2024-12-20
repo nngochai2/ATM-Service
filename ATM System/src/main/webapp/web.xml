@@ -7,6 +7,12 @@
     <!-- Application Name -->
     <display-name>ATM System</display-name>
 
+    <!-- Resource mapping -->
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/resources/*</url-pattern>
+    </servlet-mapping>
+
     <!-- Welcome File -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
