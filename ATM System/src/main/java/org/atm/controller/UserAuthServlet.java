@@ -25,14 +25,17 @@ public class UserAuthServlet extends BaseServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String cardNumber = request.getParameter("cardNumber");
-        String pin = request.getParameter("pin");
 
+        // Set response type
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        String cardNumber = request.getParameter("cardNumber");
+        String pin = request.getParameter("pin");
+
         // Validate input
         if (cardNumber == null || pin == null || cardNumber.trim().isEmpty() || pin.trim().isEmpty()) {
+            // Use from BaseServlet
             sendJsonResponse(response, "{\"success\": false, \"message\": \"Card number and PIN are required\"}");
             return;
         }
@@ -42,11 +45,11 @@ public class UserAuthServlet extends BaseServlet {
             if (userService.authenticate(cardNumberLong, pin)) {
                 HttpSession session = request.getSession();
                 session.setAttribute("cardNumber", cardNumberLong);
+
+                // Return JSON response
                 sendJsonResponse(response, "{\"success\": true, \"message\": \"Login successful\"}");
-                response.sendRedirect("dashboard.jsp");
             } else {
                 sendJsonResponse(response, "{\"success\": false, \"message\": \"Invalid credentials\"}");
-                response.sendRedirect("login.jsp");
             }
         } catch (NumberFormatException e) {
             sendJsonResponse(response, "{\"success\": false, \"message\": \"Invalid card number format\"}");
