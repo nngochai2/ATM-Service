@@ -41,7 +41,17 @@ public class TransactionServlet extends BaseServlet {
                 return;
             }
 
-            double amount = Double.parseDouble(request.getParameter("amount"));
+            double amount;
+            try {
+                amount = Double.parseDouble(request.getParameter("amount"));
+                if (amount <= 0) {
+                    sendErrorResponse(response, "Amount must be greater than 0");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                sendErrorResponse(response, "Amount must be a number");
+                return;
+            }
 
             switch (action) {
                 case "deposit":
