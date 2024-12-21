@@ -7,17 +7,21 @@
 </head>
 <body>
 <div class="dashboard-container">
+    <!-- Navbar -->
     <nav class="navbar">
-        <h2>Welcome to ATM</h2>
+        <h2>ATM System</h2>
         <button onclick="logout()" class="btn-logout">Logout</button>
     </nav>
 
+    <!-- Main content area -->
     <div class="main-content">
-        <div class="balance-section">
+        <!-- Balance section in a "card" style container -->
+        <div class="card balance-section">
             <h3>Current Balance</h3>
             <div id="balanceAmount" class="balance-amount">$0.00</div>
         </div>
 
+        <!-- Grid of action cards -->
         <div class="actions-grid">
             <div class="action-card" onclick="showTransactionForm('withdraw')">
                 <h3>Withdraw</h3>
@@ -26,7 +30,7 @@
 
             <div class="action-card" onclick="showTransactionForm('deposit')">
                 <h3>Deposit</h3>
-                <p>Deposit money to your account</p>
+                <p>Deposit money into your account</p>
             </div>
 
             <div class="action-card" onclick="showTransactionForm('transfer')">
@@ -36,37 +40,44 @@
 
             <div class="action-card" onclick="showChangePin()">
                 <h3>Change PIN</h3>
-                <p>Update your PIN</p>
+                <p>Update your 4-digit PIN</p>
             </div>
         </div>
 
-        <!-- Transaction Form Modal -->
+        <!-- Modal for transaction form -->
         <div id="transactionModal" class="modal">
             <div class="modal-content">
+                <!-- Close button -->
                 <span class="close">&times;</span>
                 <h2 id="modalTitle">Transaction</h2>
+
                 <form id="transactionForm">
                     <div class="form-group">
                         <label for="amount">Amount</label>
                         <input type="number" id="amount" name="amount" min="0" step="0.01" required>
                     </div>
+
+                    <!-- Extra fields shown only for transfer -->
                     <div id="transferFields" style="display:none">
                         <div class="form-group">
                             <label for="toCard">To Card Number</label>
-                            <input type="text" id="toCard" name="toCard" pattern="\d{10}">
+                            <!-- Pattern for exactly 10 digits -->
+                            <input type="text" id="toCard" name="toCard" pattern="\\d{10}">
                         </div>
                         <div class="form-group">
                             <label for="description">Description</label>
                             <input type="text" id="description" name="description">
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary">Submit</button>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Inline JavaScript for dashboard functionality -->
 <script>
     const modal = document.getElementById('transactionModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -75,10 +86,10 @@
     const closeButton = document.querySelector('.close');
     let currentHandler = null;
 
-    // Load balance on page load
+    // Fetch the user's balance on page load
     window.onload = function() {
         fetchBalance();
-    }
+    };
 
     function fetchBalance() {
         fetch('${pageContext.request.contextPath}/user/balance')
@@ -93,23 +104,24 @@
             });
     }
 
+    // Show the transaction modal and configure the form
     function showTransactionForm(type) {
-        modalTitle.textContent = type.charAt(0).toUpperCase() + type.slice(1);
-        transferFields.style.display = type === 'transfer' ? 'block' : 'none';
+        // Update the modal title based on the action
+        modalTitle.textContent = capitalize(type);
+        // Show transfer-specific fields only if needed
+        transferFields.style.display = (type === 'transfer') ? 'block' : 'none';
         modal.style.display = 'block';
 
-        // Remove previous handler if exists
+        // Remove any previous submit event handler
         if (currentHandler) {
             transactionForm.removeEventListener('submit', currentHandler);
         }
 
-        // Create new handler
-        currentHandler = function (e) {
+        // Create a new handler for this transaction type
+        currentHandler = function(e) {
             e.preventDefault();
             handleTransaction(type);
-        }
-
-        // Add new event listener
+        };
         transactionForm.addEventListener('submit', currentHandler);
     }
 
@@ -130,9 +142,7 @@
 
         fetch('${pageContext.request.contextPath}/user/transaction', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: data
         })
             .then(response => response.json())
@@ -151,25 +161,28 @@
             });
     }
 
+    // Navigate to change PIN page
     function showChangePin() {
         window.location.href = '${pageContext.request.contextPath}/user/changePin';
     }
 
+    // Close the modal and reset the form
     function closeModal() {
         modal.style.display = 'none';
         transactionForm.reset();
     }
 
-    // Event Listeners
+    // Close when user clicks the 'X'
     closeButton.onclick = closeModal;
 
-    // Close modal when clicking outside
+    // Also close the modal if user clicks outside it
     window.onclick = function(event) {
         if (event.target === modal) {
             closeModal();
         }
-    }
+    };
 
+    // Logout function
     function logout() {
         fetch('${pageContext.request.contextPath}/logout')
             .then(response => {
@@ -183,6 +196,11 @@
                 console.error('Error:', error);
                 alert('Error during logout');
             });
+    }
+
+    // Helper to capitalize first letter of a word
+    function capitalize(word) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
     }
 </script>
 </body>

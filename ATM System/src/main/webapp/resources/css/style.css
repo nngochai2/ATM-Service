@@ -1,52 +1,135 @@
+/* ----------------------------------------------------------------
+   1. Global Reset & Body
+------------------------------------------------------------------ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Body: Subtle Gradient, Centered Content */
 body {
     font-family: 'Montserrat', sans-serif;
     background: linear-gradient(to right, #f8fbfc 0%, #eceff1 100%);
+    /*display: flex;*/
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    /*min-height: 100vh;*/
+    margin: 0;
+}
+
+.centered-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    min-height: 100vh; /* Ensures the page fills the screen height */
 }
 
-/* Main Container: Flex for two columns (image and form) */
+/* ----------------------------------------------------------------
+   2. Common Button Styles
+------------------------------------------------------------------ */
+.btn {
+    display: inline-block;
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.8rem 1.2rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+/* Primary button */
+.btn-primary {
+    background-color: #2a9d8f;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #23877c;
+    transform: translateY(-2px);
+}
+
+/* Secondary button */
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 1rem;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* ----------------------------------------------------------------
+   3. Error & Messages
+------------------------------------------------------------------ */
+.error-message {
+    color: #dc3545;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+/* ----------------------------------------------------------------
+   4. Landing / Home Page
+------------------------------------------------------------------ */
+.landing-container {
+    text-align: center;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Group of buttons on landing pages */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* ----------------------------------------------------------------
+   5. Glass-Style Login Container
+------------------------------------------------------------------ */
+/* Main Container: two columns (image + form) for the login page */
 .login-container {
     display: flex;
+    margin: auto;
     width: 90%;
     max-width: 950px;
-    background-color: #ffffffcc; /* Slight transparency for a clean look */
-    backdrop-filter: blur(8px);  /* Adds a subtle “glass” effect */
+    background-color: #ffffffcc; /* Slightly transparent white */
+    backdrop-filter: blur(8px);  /* "Glass" effect */
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Left side: Image section */
+/* Left side: background image (or logo) */
 .login-image {
     flex: 1;
-    background: url('https://t4.ftcdn.net/jpg/05/22/80/25/360_F_522802579_t3NfsHQURX5yqdnyfGf7VvddpZ9ruq3T.jpg') no-repeat center center;
+    background: url('https://t4.ftcdn.net/jpg/05/22/80/25/360_F_522802579_t3NfsHQURX5yqdnyfGf7VvddpZ9ruq3T.jpg')
+    no-repeat center center;
     background-size: cover;
 }
 /*
-  Single logo:
-  .login-image {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #fafafa;
-  }
-  .login-image img {
-      max-width: 200px;
-  }
+   If use a logo instead:
+   .login-image {
+       flex: 1;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       background-color: #fafafa;
+   }
+   .login-image img {
+       max-width: 200px;
+   }
 */
 
-/* Right side: Login choices */
+/* Right side: form section */
 .login-form {
     flex: 1;
     padding: 2.5rem;
@@ -68,61 +151,35 @@ body {
     line-height: 1.4;
 }
 
-/* Button container with vertical spacing */
+/* For a vertical stack of login buttons (if needed) */
 .login-buttons {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-/* Shared button style */
-.btn {
-    display: inline-block;
-    text-decoration: none;
-    font-weight: 600;
-    text-align: center;
-    padding: 0.8rem 1.2rem;
-    border-radius: 6px;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-/* Primary color for login buttons */
-.btn-primary {
-    background-color: #2a9d8f; /* Example accent color */
-    color: #fff;
-}
-.btn-primary:hover {
-    background-color: #23877c;
-    transform: translateY(-2px);
-}
-
-/* Additional links or small text at the bottom */
+/* ----------------------------------------------------------------
+   6. Note / Small Text Links
+------------------------------------------------------------------ */
 .note {
     margin-top: 2rem;
     font-size: 0.9rem;
     color: #777;
 }
+
 .note a {
     color: #2a9d8f;
     text-decoration: none;
     font-weight: 500;
 }
+
 .note a:hover {
     text-decoration: underline;
 }
 
-/* Responsive Design: Stack on smaller screens */
-@media (max-width: 768px) {
-    .login-container {
-        flex-direction: column;
-        max-width: 95%;
-    }
-    .login-image {
-        height: 200px; /* Reduced height for the image on mobile */
-        flex: none;
-    }
-}
-
+/* ----------------------------------------------------------------
+   7. Form Elements & Cards
+------------------------------------------------------------------ */
 .form-group {
     margin-bottom: 1rem;
 }
@@ -139,6 +196,27 @@ input {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+}
+
+/* For inputs with transitions on focus */
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: #2a9d8f;
+    outline: none;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
 .card {
@@ -164,66 +242,9 @@ input {
     padding: 2rem;
 }
 
-.button-group {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 1rem;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-.error-message {
-    color: #dc3545;
-    margin-top: 1rem;
-    text-align: center;
-}
-
-.landing-container {
-    text-align: center;
-    padding: 2rem;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.button-group {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-.form-control {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-}
-
-.form-control:focus {
-    border-color: #2a9d8f;
-    outline: none;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
+/* ----------------------------------------------------------------
+   8. Dashboard & Navbar
+------------------------------------------------------------------ */
 .dashboard-container {
     min-height: 100vh;
     background-color: #f5f5f5;
@@ -253,6 +274,9 @@ input {
     margin: 0 auto;
 }
 
+/* ----------------------------------------------------------------
+   9. Balance & Actions
+------------------------------------------------------------------ */
 .balance-section {
     background-color: white;
     padding: 2rem;
@@ -285,6 +309,9 @@ input {
     transform: translateY(-5px);
 }
 
+/* ----------------------------------------------------------------
+   10. Modals
+------------------------------------------------------------------ */
 .modal {
     display: none;
     position: fixed;
@@ -311,4 +338,18 @@ input {
     top: 1rem;
     font-size: 1.5rem;
     cursor: pointer;
+}
+
+/* ----------------------------------------------------------------
+   11. Responsive Adjustments
+------------------------------------------------------------------ */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+        max-width: 95%;
+    }
+    .login-image {
+        height: 200px; /* Reduced height for the image on mobile */
+        flex: none;
+    }
 }

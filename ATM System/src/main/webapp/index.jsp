@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
-<body>
+<body class="centered-page">
 <div class="login-container">
     <!-- Left Section: Image or Logo -->
     <div class="login-image">
