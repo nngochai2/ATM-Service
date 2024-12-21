@@ -51,7 +51,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = `${pageContext.request.contextPath}/user/dashboard`;
+                    window.location.href = '${pageContext.request.contextPath}/user/dashboard';
                 } else {
                     document.getElementById('errorMessage').textContent = data.message
                 }

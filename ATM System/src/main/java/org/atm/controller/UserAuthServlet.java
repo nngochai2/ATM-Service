@@ -47,9 +47,7 @@ public class UserAuthServlet extends BaseServlet {
                 session.setAttribute("cardNumber", cardNumberLong);
 
                 // Return JSON response
-                sendJsonResponse(response,
-                        "{\"success\": true, \"message\": \"Login successful\", " +
-                                "\"redirectUrl\": \"" + request.getContextPath() + "/user/dashboard\"}");
+                sendJsonResponse(response, "{\"success\": true, \"message\": \"Login successful\"}");
             } else {
                 sendJsonResponse(response, "{\"success\": false, \"message\": \"Invalid credentials\"}");
             }
