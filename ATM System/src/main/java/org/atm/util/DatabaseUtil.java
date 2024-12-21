@@ -1,19 +1,28 @@
 package org.atm.util;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
 public class DatabaseUtil {
+    private static final Dotenv dotenv = Dotenv.load();
     private static final Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
 
-    private static final String URL =
-            "jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?user=postgres.duvbnejsreiybzujqijt&password=Nguyenngochai135&sslmode=require";
+    private static final String URL = dotenv.get("DB_URL");
+    private static final String USER = dotenv.get("DB_USER");
+    private static final String PASSWORD = dotenv.get("DB_PASSWORD");
 
     public static Connection getConnection() throws SQLException {
-
-        return DriverManager.getConnection(URL);
+        try {
+            Class.forName("org.postgresql.Driver");
+            assert URL != null;
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (ClassNotFoundException e) {
+            logger.error("PostgreSQL Driver not found", e);
+            throw new SQLException("PostgreSQL Driver not found", e);
+        }
     }
 
     public static void main(String[] args) {

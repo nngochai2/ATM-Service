@@ -43,8 +43,10 @@ public class UserAuthServlet extends BaseServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("cardNumber", cardNumberLong);
                 sendJsonResponse(response, "{\"success\": true, \"message\": \"Login successful\"}");
+                response.sendRedirect("dashboard.jsp");
             } else {
                 sendJsonResponse(response, "{\"success\": false, \"message\": \"Invalid credentials\"}");
+                response.sendRedirect("login.jsp");
             }
         } catch (NumberFormatException e) {
             sendJsonResponse(response, "{\"success\": false, \"message\": \"Invalid card number format\"}");
