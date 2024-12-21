@@ -27,7 +27,7 @@ public class DashboardServlet extends BaseServlet {
         HttpSession session = req.getSession(false);
 
         // Check if user is logged in
-        if (session != null || session.getAttribute("cardNumber") == null) {
+        if (session == null || session.getAttribute("cardNumber") == null) {
             resp.sendRedirect(req.getContextPath() + "/user/auth");
             return;
         }
