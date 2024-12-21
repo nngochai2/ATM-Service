@@ -68,6 +68,13 @@
 </div>
 
 <script>
+    const modal = document.getElementById('transactionModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const transferFields = document.getElementById('transferFields');
+    const transactionForm = document.getElementById('transactionForm');
+    const closeButton = document.querySelector('.close');
+    let currentHandler = null;
+
     // Load balance on page load
     window.onload = function() {
         fetchBalance();
@@ -80,41 +87,53 @@
                 document.getElementById('balanceAmount').textContent =
                     '$' + Number(data.balance).toFixed(2);
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error fetching balance');
+            });
     }
 
     function showTransactionForm(type) {
-        const modal = document.getElementById('transactionModal');
-        const title = document.getElementById('modalTitle');
-        const transferFields = document.getElementById('transferFields');
-
-        title.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+        modalTitle.textContent = type.charAt(0).toUpperCase() + type.slice(1);
         transferFields.style.display = type === 'transfer' ? 'block' : 'none';
         modal.style.display = 'block';
 
-        // Update form submission handling
-        document.getElementById('transactionForm').onsubmit = function(e) {
+        // Remove previous handler if exists
+        if (currentHandler) {
+            transactionForm.removeEventListener('submit', currentHandler);
+        }
+
+        // Create new handler
+        currentHandler = function (e) {
             e.preventDefault();
             handleTransaction(type);
         }
+
+        // Add new event listener
+        transactionForm.addEventListener('submit', currentHandler);
     }
 
     function handleTransaction(type) {
         const amount = document.getElementById('amount').value;
-        let data = `amount=${amount}`;
+        let data = `action=${type}&amount=${amount}`;
 
         if (type === 'transfer') {
             const toCard = document.getElementById('toCard').value;
             const description = document.getElementById('description').value;
+
+            if (!toCard || !description) {
+                alert('Please fill in all transfer details');
+                return;
+            }
             data += `&toCard=${toCard}&description=${description}`;
         }
 
-        fetch(`${pageContext.request.contextPath}/user/transaction`, {
+        fetch('${pageContext.request.contextPath}/user/transaction', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `action=${type}&${data}`
+            body: data
         })
             .then(response => response.json())
             .then(data => {
@@ -123,26 +142,46 @@
                     fetchBalance();
                     closeModal();
                 } else {
-                    alert(data.message);
+                    alert(data.message || 'Transaction failed');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred');
+                alert('An error occurred during the transaction');
             });
     }
 
-    function closeModal() {
-        document.getElementById('transactionModal').style.display = 'none';
-        document.getElementById('transactionForm').reset();
+    function showChangePin() {
+        window.location.href = '${pageContext.request.contextPath}/user/changePin';
     }
 
-    document.querySelector('.close').onclick = closeModal;
+    function closeModal() {
+        modal.style.display = 'none';
+        transactionForm.reset();
+    }
+
+    // Event Listeners
+    closeButton.onclick = closeModal;
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
 
     function logout() {
         fetch('${pageContext.request.contextPath}/logout')
-            .then(() => {
-                window.location.href = '${pageContext.request.contextPath}/';
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '${pageContext.request.contextPath}/';
+                } else {
+                    throw new Error('Logout failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error during logout');
             });
     }
 </script>

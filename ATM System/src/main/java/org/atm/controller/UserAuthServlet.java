@@ -44,7 +44,7 @@ public class UserAuthServlet extends BaseServlet {
             Long cardNumberLong = Long.valueOf(cardNumber);
             if (userService.authenticate(cardNumberLong, pin)) {
                 HttpSession session = request.getSession();
-                session.setAttribute("cardNumber", cardNumberLong);
+                session.setAttribute("cardNumber", cardNumber);
 
                 // Return JSON response
                 sendJsonResponse(response, "{\"success\": true, \"message\": \"Login successful\"}");

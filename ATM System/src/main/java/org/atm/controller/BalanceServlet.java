@@ -37,7 +37,8 @@ public class BalanceServlet extends BaseServlet {
         }
 
         try {
-            Long cardNumber = Long.valueOf((String) session.getAttribute("cardNumber"));
+            String cardNumberStr = (String) session.getAttribute("cardNumber");
+            Long cardNumber = Long.valueOf(cardNumberStr);
             double balance = userService.getBalance(cardNumber);
             sendJsonResponse(response, new Gson().toJson(Collections.singletonMap("balance", balance)));
         } catch (ATMException e) {
