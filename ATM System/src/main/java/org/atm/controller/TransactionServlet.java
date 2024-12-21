@@ -27,12 +27,12 @@ public class TransactionServlet extends BaseServlet {
         throws ServletException, IOException {
         HttpSession session = request.getSession(false);
 
-        if (session == null || session.getAttribute("card_number") == null) {
+        if (session == null || session.getAttribute("cardNumber") == null) {
             sendErrorResponse(response, "Not authenticated");
             return;
         }
 
-        Long cardNumber = (Long) session.getAttribute("card_number");
+        Long cardNumber = (Long) session.getAttribute("cardNumber");
         String action = request.getParameter("action");
 
         try {
@@ -51,23 +51,31 @@ public class TransactionServlet extends BaseServlet {
 
                 case "withdraw":
                     userService.withdraw(cardNumber, amount);
-                    sendJsonResponse(response, "{\"success\": true, \"message\": \"Deposit successful\"}");
+                    sendJsonResponse(response, "{\"success\": true, \"message\": \"Withdrawal successful\"}");
                     break;
 
                 case "transfer":
-                    Long toCard = Long.valueOf(request.getParameter("to_card"));
+                    String toCardStr = request.getParameter("toCard");
                     String description = request.getParameter("description");
 
-                    if (toCard.equals(cardNumber)) {
+                    if (toCardStr == null || toCardStr.isEmpty()) {
                         sendErrorResponse(response, "Cannot transfer to the same account");
                     }
 
-                    if (userService.transferMoney(cardNumber, toCard, amount, description)) {
-                        sendJsonResponse(response, "{\"success\": true, \"message\": \"Transfer successful\"}");
-                        break;
-                    }
-                    return;
+                    try {
+                        Long toCard = Long.parseLong(toCardStr);
+                        if (toCard.equals(cardNumber)) {
+                            sendErrorResponse(response, "Cannot transfer to the same account");
+                            return;
+                        }
 
+                        userService.transferMoney(cardNumber, toCard, amount, description);
+                        sendJsonResponse(response, "{\"success\": true, \"message\": \"Transfer successful\"}");
+
+                    } catch (NumberFormatException e) {
+                        sendErrorResponse(response, "Invalid card number format");
+                    }
+                    break;
                 default:
                     sendErrorResponse(response, "Invalid action.");
             }
@@ -82,7 +90,7 @@ public class TransactionServlet extends BaseServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("card_number") == null) {
+        if (session == null || session.getAttribute("cardNumber") == null) {
             sendErrorResponse(response, "Not authenticated");
             return;
         }
