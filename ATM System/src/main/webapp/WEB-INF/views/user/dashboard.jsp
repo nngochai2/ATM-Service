@@ -76,8 +76,6 @@
         </div>
     </div>
 </div>
-
-<!-- Inline JavaScript for dashboard functionality -->
 <script>
     const modal = document.getElementById('transactionModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -106,8 +104,12 @@
 
     // Show the transaction modal and configure the form
     function showTransactionForm(type) {
+        const amount = document.getElementById('amount').value;
+        console.log(`Action:`, type, `Amount:`, amount)
+
         // Update the modal title based on the action
         modalTitle.textContent = capitalize(type);
+
         // Show transfer-specific fields only if needed
         transferFields.style.display = (type === 'transfer') ? 'block' : 'none';
         modal.style.display = 'block';
@@ -126,9 +128,22 @@
     }
 
     function handleTransaction(type) {
-        const amount = document.getElementById('amount').value;
-        let data = `action=${type}&amount=${amount}`;
+        console.log('Action type: ', type);
 
+        // Retrieve and validate the amount
+        const amountInput = document.getElementById('amount');
+        const amount = amountInput.value.trim();
+
+        // Validate teh amount
+        if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+            alert('Please enter a valid amount')
+            return;
+        }
+
+        // Initialize the data string
+        let data = "action=" + type + "&amount=" + amount;
+
+        // Additional data for transfer
         if (type === 'transfer') {
             const toCard = document.getElementById('toCard').value;
             const description = document.getElementById('description').value;
@@ -137,20 +152,29 @@
                 alert('Please fill in all transfer details');
                 return;
             }
-            data += `&toCard=${toCard}&description=${description}`;
+            data += "&toCard=" + toCard + "&description=" + description;
         }
 
+        console.log('Sending data:', data);
+
+        // Sending the request to the server
         fetch('${pageContext.request.contextPath}/user/transaction', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: data
         })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error("Server responded with status" + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     alert(data.message);
-                    fetchBalance();
-                    closeModal();
+                    fetchBalance(); // Refresh the balance
+                    closeModal(); // Close the modal
                 } else {
                     alert(data.message || 'Transaction failed');
                 }

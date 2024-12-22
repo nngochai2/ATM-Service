@@ -83,7 +83,18 @@ public class UserServiceImpl implements UserService {
             }
 
             double newBalance = user.getBalance() - amount;
-            return userDAO.updateBalance(cardNumber, newBalance);
+            if (userDAO.updateBalance(cardNumber, newBalance)) {
+                // Save the transaction
+                Transaction transaction = new Transaction(
+                        cardNumber,
+                        Transaction.TransactionType.WITHDRAW,
+                        amount,
+                        newBalance,
+                        "Withdrawal"
+                );
+                return transactionDAO.save(transaction);
+            }
+            return false;
         } catch (Exception e) {
             throw new ATMException("Error processing withdrawal", e);
         }
