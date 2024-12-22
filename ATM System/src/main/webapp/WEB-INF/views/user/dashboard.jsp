@@ -163,7 +163,7 @@
 
     // Navigate to change PIN page
     function showChangePin() {
-        window.location.href = '${pageContext.request.contextPath}/user/changePin';
+        window.location.href = `${pageContext.request.contextPath}/user/changePin`;
     }
 
     // Close the modal and reset the form

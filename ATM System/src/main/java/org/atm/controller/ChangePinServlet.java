@@ -26,6 +26,13 @@ public class ChangePinServlet extends BaseServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Forward or redirect to changePin.jsp
+        request.getRequestDispatcher("/WEB-INF/views/user/changePin.jsp").forward(request, response);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
