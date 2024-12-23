@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-@WebServlet("/admin/*")
+@WebServlet("/admin/dashboard")
 public class AdminServlet extends BaseServlet {
     private AdminService adminService;
     private static final Logger logger = LoggerFactory.getLogger(AdminServlet.class);
@@ -26,6 +26,23 @@ public class AdminServlet extends BaseServlet {
     public void init() throws ServletException {
         adminService = new AdminServiceImpl(new AdminDAOImpl(), new UserDAOImpl(), new TransactionDAOImpl());
     }
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        HttpSession session = req.getSession(false);
+        logger.info("Accessing Dashboard. Session {}", session != null);
+
+        // Check if user is logged in
+        if (session == null) {
+            logger.warn("Unauthorized access");
+            resp.sendRedirect(req.getContextPath() + "/admin/auth");
+            return;
+        }
+
+        // Forward to dashboard page
+        req.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp")
+                .forward(req, resp);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -33,7 +50,7 @@ public class AdminServlet extends BaseServlet {
         String pathInfo = request.getPathInfo();
         HttpSession session = request.getSession(false);
 
-        if (session == null || session.getAttribute("adminId") == null) {
+        if (session == null) {
             sendErrorResponse(response, "Not authenticated");
             return;
         }
