@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 @WebServlet("/user/dashboard")
-public class DashboardServlet extends BaseServlet {
-    private static final Logger logger = LoggerFactory.getLogger(DashboardServlet.class);
+public class UserDashboardServlet extends BaseServlet {
+    private static final Logger logger = LoggerFactory.getLogger(UserDashboardServlet.class);
 
     @Override
     public void init() throws ServletException {

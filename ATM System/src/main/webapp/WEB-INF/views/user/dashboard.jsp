@@ -62,7 +62,7 @@
                         <div class="form-group">
                             <label for="toCard">To Card Number</label>
                             <!-- Pattern for exactly 10 digits -->
-                            <input type="text" id="toCard" name="toCard" pattern="\\d{10}">
+                            <input type="text" id="toCard" name="toCard" pattern="\d{10}">
                         </div>
                         <div class="form-group">
                             <label for="description">Description</label>
@@ -82,6 +82,7 @@
     const transferFields = document.getElementById('transferFields');
     const transactionForm = document.getElementById('transactionForm');
     const closeButton = document.querySelector('.close');
+    const balance = document.getElementById('balanceAmount');
     let currentHandler = null;
 
     // Fetch the user's balance on page load
