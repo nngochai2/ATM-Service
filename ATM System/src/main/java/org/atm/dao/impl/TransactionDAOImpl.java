@@ -37,6 +37,27 @@ public class TransactionDAOImpl implements TransactionDAO {
     }
 
     @Override
+    public List<Transaction> findByDate(Date date) {
+        String sql = "SELECT * FROM transactions WHERE DATE(transaction_date) = ?";
+        List<Transaction> transactions = new ArrayList<>();
+
+        try (Connection conn = DatabaseUtil.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setDate(1, date);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(this.mapResultSetToTransactions(rs));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Error finding transactions for date {}", date, e);
+        }
+        return transactions;
+    }
+
+    @Override
     public List<Transaction> findByCardNumberAndDate(Long cardNumber, Date date) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT * FROM transactions WHERE card_number = ? AND date = ?";

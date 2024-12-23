@@ -8,6 +8,7 @@ import java.util.List;
 public interface TransactionDAO extends GenericDAO<Transaction> {
 
     List<Transaction> findByCardNumber(Long cardNumber);
+    List<Transaction> findByDate(Date date);
     List<Transaction> findByCardNumberAndDate(Long cardNumber, Date date);
     List<Transaction> findByCardNumberAndType(Long cardNumber, Transaction.TransactionType type);
     List<Transaction> findByType(Transaction.TransactionType type);
