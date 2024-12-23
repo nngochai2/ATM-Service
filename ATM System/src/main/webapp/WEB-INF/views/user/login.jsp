@@ -19,6 +19,7 @@
         <h2>User Login</h2>
         <p>Please enter your card number and 4-digit PIN.</p>
 
+        <%-- User fills out the login form on the page--%>
         <form id="loginForm">
             <div class="form-group">
                 <label for="cardNumber">Card Number</label>
@@ -68,14 +69,16 @@
         const formData = new FormData(this);
         const urlEncodedData = new URLSearchParams(formData).toString();
 
+        // Sends a POST request to the servlet URL
         fetch(`${pageContext.request.contextPath}/user/auth`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded' // Encode format
             },
             body: urlEncodedData
         })
             .then(response => response.json())
+            // Processes the Server's response
             .then(data => {
                 if (data.success) {
                     // On success, redirect to user dashboard

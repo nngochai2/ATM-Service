@@ -129,13 +129,14 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     @Override
     public int getDailyTransactionCount(Long cardNumber, Transaction.TransactionType type) {
-        String sql = "SELECT COUNT(*) FROM transactions WHERE card_number = ? AND transaction_type = ? \" +\n" +
+        String sql = "SELECT COUNT(*) FROM transactions WHERE card_number = ? AND type = ? " +
                 "AND DATE(transaction_date) = CURRENT_DATE";
+
         try (Connection conn = DatabaseUtil.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setLong(1, cardNumber);
-            pstmt.setString(2, String.valueOf(type));
+            pstmt.setString(2, type.toString());
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -151,7 +152,7 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public double getDailyTransactionTotal(Long cardNumber, Transaction.TransactionType type) {
         String sql = "SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE card_number = ? " +
-                    "AND transaction_type = ? AND DATE(transaction_date) = CURRENT_DATE";
+                    "AND type = ? AND DATE(transaction_date) = CURRENT_DATE";
         try (Connection conn = DatabaseUtil.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -176,7 +177,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     @Override
     public boolean save(Transaction transaction) {
-        String sql = "INSERT INTO transactions (card_number, type, amount, balance_after, description, date) " +
+        String sql = "INSERT INTO transactions (card_number, type, amount, balance_after, description, transaction_date) " +
                     "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP) RETURNING transaction_id";
 
         try (Connection conn = DatabaseUtil.getConnection();

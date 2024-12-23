@@ -134,7 +134,7 @@
         const amountInput = document.getElementById('amount');
         const amount = amountInput.value.trim();
 
-        // Validate teh amount
+        // Validate the amount
         if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
             alert('Please enter a valid amount')
             return;

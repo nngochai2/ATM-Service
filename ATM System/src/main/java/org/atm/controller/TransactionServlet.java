@@ -115,9 +115,10 @@ public class TransactionServlet extends BaseServlet {
                     break;
 
                 case "deposit":
-                    userService.deposit(cardNumber, amount);
-                    sendJsonResponse(response, "{\"success\": true, \"message\": \"Deposit successful\"}");
-                    break;
+                    if (userService.deposit(cardNumber, amount)) {
+                        sendJsonResponse(response, "{\"success\": true, \"message\": \"Deposit successful\"}");
+                        break;
+                    }
 
                 case "transfer":
                     // Additional params
@@ -129,9 +130,13 @@ public class TransactionServlet extends BaseServlet {
                     Long toCard = Long.valueOf(toCardStr);
                     String description = request.getParameter("description");
 
-                    userService.transferMoney(cardNumber, toCard, amount, description);
-                    sendJsonResponse(response, "{\"success\": true, \"message\": \"Transfer successful\"}");
-                    break;
+                    if (userService.transferMoney(cardNumber, toCard, amount, description)) {
+                        sendJsonResponse(response, "{\"success\": true, \"message\": \"Transfer successful\"}");
+                        break;
+                    } else {
+                        sendErrorResponse(response, "Transfer failed");
+                        return;
+                    }
 
                 default:
                     sendErrorResponse(response, "Invalid action");

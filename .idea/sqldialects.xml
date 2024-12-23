@@ -2,6 +2,7 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/ATM System/src/main/java/org/atm/dao/impl/AdminDAOImpl.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/ATM System/src/main/java/org/atm/dao/impl/TransactionDAOImpl.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/ATM System/src/main/java/org/atm/dao/impl/UserDAOImpl.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/ATM System/src/main/java/org/atm/util/DatabaseUtil.java" dialect="GenericSQL" />
   </component>
