@@ -45,35 +45,6 @@
         </div>
 
         <!-- Modal for transaction form -->
-        <div id="transactionModal" class="modal">
-            <div class="modal-content">
-                <!-- Close button -->
-                <span class="close">&times;</span>
-                <h2 id="modalTitle">Transaction Details</h2>
-
-                <form id="transactionForm">
-                    <div class="form-group">
-                        <label for="amount">Amount</label>
-                        <input type="number" id="amount" name="amount" min="0" step="0.01" required>
-                    </div>
-
-                    <!-- Extra fields shown only for transfer -->
-                    <div id="transferFields" style="display:none">
-                        <div class="form-group">
-                            <label for="toCard">To Card Number</label>
-                            <!-- Pattern for exactly 10 digits -->
-                            <input type="text" id="toCard" name="toCard" pattern="\d{10}">
-                        </div>
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <input type="text" id="description" name="description">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
-        </div>
     </div>
 </div>
 <script>
