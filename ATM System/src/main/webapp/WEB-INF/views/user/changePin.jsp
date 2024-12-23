@@ -9,16 +9,16 @@
 
 <body class="centered-page">
 
-<div class="login-container"><!-- or .landing-container if you prefer -->
+<div class="form-group"><!-- or .landing-container if you prefer -->
     <div style="display: flex; margin: auto">
-        <h2 class="">Change PIN</h2>
-        <p>
+        <h2 class="card-header">Change PIN</h2>
+        <p class="note" style="display: flex; text-align: start; padding-left: 10px">
             Please enter your current PIN and the new PIN you wish to set.
         </p>
     </div>
 
     <!-- PIN Change Form -->
-    <form id="changePinForm">
+    <form id="changePinForm" style="padding-top: 20px">
         <div class="form-group">
             <label for="oldPin">Old PIN</label>
             <input type="password"
@@ -77,32 +77,38 @@
         const newPin = document.getElementById('newPin').value;
         const confirmPin = document.getElementById('confirmPin').value;
 
+        // Add validation
         if (newPin !== confirmPin) {
-            document.getElementById('errorMessage').textContent = 'New PINs do not match';
+            alert('New PINs do not match');
             return;
         }
 
-        fetch(pageContext.request.contextPath + '/user/changePin', {
+        const formData = new URLSearchParams();
+        formData.append('oldPin', oldPin);
+        formData.append('newPin', newPin);
+
+        console.log('Sending data:', formData.toString()); // Debug log
+
+        fetch('${pageContext.request.contextPath}/user/changePin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: 'oldPin=' + oldPin + '&newPin=' + newPin
+            body: formData.toString()
         })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     alert('PIN changed successfully. Please login again.');
-                    window.location.href = pageContext.request.contextPath + '/user/auth';
+                    window.location.href = '${pageContext.request.contextPath}/user/auth';
                 } else {
-                    document.getElementById('errorMessage').textContent = data.message;
+                    alert(data.message || 'Failed to change PIN');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('errorMessage').textContent = 'An error occurred while changing PIN';
+                alert('Error changing PIN');
             });
-    });
-</script>
+    });</script>
 </body>
 </html>

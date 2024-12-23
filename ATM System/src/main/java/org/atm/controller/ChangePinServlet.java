@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.atm.dao.impl.TransactionDAOImpl;
 import org.atm.dao.impl.UserDAOImpl;
-import org.atm.exception.ATMException;
 import org.atm.service.UserService;
 import org.atm.service.impl.UserServiceImpl;
 import org.slf4j.Logger;
@@ -35,42 +34,40 @@ public class ChangePinServlet extends BaseServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        logger.info("Received PIN change request"); // Add logging
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("cardNumber") == null) {
             sendErrorResponse(response, "Not authenticated");
             return;
         }
 
-        Long cardNumber = Long.valueOf((String) session.getAttribute("cardNumber"));
-        String oldPin = request.getParameter("oldPin");
-        String newPin = request.getParameter("newPin");
-        String confirmPin = request.getParameter("confirmPin");
-
         try {
-            if (oldPin == null || newPin == null || confirmPin == null) {
-                sendErrorResponse(response, "All PIN fields are required");
-                return;
-            }
+            String cardNumberStr = (String) session.getAttribute("cardNumber");
+            Long cardNumber = Long.valueOf(cardNumberStr);
+            String oldPin = request.getParameter("oldPin");
+            String newPin = request.getParameter("newPin");
 
-            if (!newPin.equals(confirmPin)) {
-                sendErrorResponse(response, "New PINs do not match");
-                return;
-            }
+            logger.debug("Received PIN change request - Card: {}, Old PIN length: {}, New PIN length: {}",
+                    cardNumber,
+                    oldPin != null ? oldPin.length() : 0,
+                    newPin != null ? newPin.length() : 0);
 
-            if (!newPin.matches("\\d{4}")) {
-                sendErrorResponse(response, "PIN must be exactly 4 digits");
+            if (oldPin == null || newPin == null ||
+                    !oldPin.matches("\\d{4}") || !newPin.matches("\\d{4}")) {
+                sendErrorResponse(response, "PIN must be 4 digits");
                 return;
             }
 
             if (userService.changePin(cardNumber, oldPin, newPin)) {
-                session.invalidate(); // Force re-login with new PIN
-                sendJsonResponse(response, "{\"success\": true, \"message\": \"PIN changed successfully. Please login again.\"}");
+                session.invalidate();
+                sendJsonResponse(response, "{\"success\": true, \"message\": \"PIN changed successfully\"}");
             } else {
                 sendErrorResponse(response, "Failed to change PIN");
             }
-        } catch (ATMException e) {
-            logger.error("Error changing PIN for card: {}", cardNumber, e);
-            sendErrorResponse(response, e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error changing PIN", e);
+            sendErrorResponse(response, "Error changing PIN");
         }
     }
 }
