@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ATM - Admin</title>
+    <title>ATM - Admin Dashboard</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
@@ -13,9 +13,9 @@
         <button onclick="logout()" class="btn-logout">Logout</button>
     </nav>
 
-    <!-- Main content area -->
+    <!-- Main Content -->
     <div class="main-content">
-        <!-- Balance section in a "card" style container -->
+        <!-- Initial View - Report Buttons -->
         <div class="card balance-section">
             <h3>Welcome Admin</h3>
             <div id="adminName" class="balance-amount">Admin</div>
@@ -47,135 +47,112 @@
         <!-- Modal for transaction form -->
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.0/js/dataTables.min.js"></script>
 <script>
-    const modal = document.getElementById('transactionModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const transferFields = document.getElementById('transferFields');
-    const transactionForm = document.getElementById('transactionForm');
-    const closeButton = document.querySelector('.close');
-    const balance = document.getElementById('balanceAmount');
-    let currentHandler = null;
+    let currentReportType = '';
+    let reportTable;
 
-    // Fetch the user's balance on page load
-    window.onload = function() {
-        fetchAdminName();
-    };
+    function showReport(type) {
+        currentReportType = type;
+        document.getElementById('reportButtons').style.display = 'none';
+        document.getElementById('reportView').style.display = 'block';
 
-    function fetchAdminName() {
-        fetch('${pageContext.request.contextPath}/admin/name')
+        // Set report title
+        const titles = {
+            'withdraw': 'Withdrawal Report',
+            'deposit': 'Deposit Report',
+            'transfer': 'Transfer Report',
+            'account': 'Account Report'
+        };
+        document.getElementById('reportTitle').textContent = titles[type];
+
+        // Initialize the table based on report type
+        initalizeTable(type);
+        generateReport();
+    }
+
+    function showDashboard() {
+        document.getElementById('reportButtons').style.display = 'block';
+        document.getElementById('reportView').style.display = 'none';
+
+        if (reportTable) {
+            reportTable.destroy();
+        }
+    }
+
+    function initializeTable(type) {
+        const columns = getColumnsForType(type);
+
+        if (reportTable) {
+            reportTable.destroy();
+        }
+
+        reportTable = ${'#reportTable'}.DataTable({
+            columns: columns,
+            order: [[0, 'desc']],
+            pageLength: 10,
+            responsive: true
+        })
+    }
+
+    function getColumnsForType(type) {
+        const commonColumns = [
+            {
+                data: 'transactionDate',
+                title: 'Date/Time'
+            },
+            {
+                data: 'cardNumber',
+                title: 'Card Number'
+            },
+            {
+                data: 'amount',
+                title: 'Amount',
+                render: data => '$' + Number(data).toFixed(2)
+            },
+            {
+                data: 'balanceAfter',
+                title: 'Balance After',
+                render: data => '$' + Number(data).toFixed(2)
+            }
+        ];
+
+        if (type === 'account') {
+            return [
+                { data: 'userId', title: 'User ID' },
+                { data: 'cardNumber', title: 'Card Number' },
+                { data: 'name', title: 'Name' },
+                { data: 'contactNumber', title: 'Contact' },
+                { data: 'balance', title: 'Balance',
+                    render: data => '$' + Number(data).toFixed(2) }
+            ];
+        } else if (type === 'transfer') {
+            return [
+                ...commonColumns,
+                { data: 'description', title: 'Description' }
+            ];
+        }
+
+        return commonColumns;
+    }
+
+    function generateReport() {
+        const date = document.getElementById('reportDate').value;
+
+        fetch(`${pageContext.request.contextPath}/admin/report?` +
+            'type=' + currentReportType + '&date=' + date)
             .then(response => response.json())
             .then(data => {
-                document.getElementById('adminName').textContent = data.name;
+                reportTable.clear();
+                reportTable.rows.add(data);
+                reportTable.draw();
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert("Error fetching admin name");
-            });
-    }
-
-    // Show the transaction modal and configure the form
-    function showTransactionForm(type) {
-        const amount = document.getElementById('amount').value;
-        console.log(`Action:`, type, `Amount:`, amount)
-
-        // Update the modal title based on the action
-        modalTitle.textContent = capitalize(type);
-
-        // Show transfer-specific fields only if needed
-        transferFields.style.display = (type === 'transfer') ? 'block' : 'none';
-        modal.style.display = 'block';
-
-        // Remove any previous submit event handler
-        if (currentHandler) {
-            transactionForm.removeEventListener('submit', currentHandler);
-        }
-
-        // Create a new handler for this transaction type
-        currentHandler = function(e) {
-            e.preventDefault();
-            handleTransaction(type);
-        };
-        transactionForm.addEventListener('submit', currentHandler);
-    }
-
-    function handleTransaction(type) {
-        console.log('Action type: ', type);
-
-        // Retrieve and validate the amount
-        const amountInput = document.getElementById('amount');
-        const amount = amountInput.value.trim();
-
-        // Validate the amount
-        if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-            alert('Please enter a valid amount')
-            return;
-        }
-
-        // Initialize the data string
-        let data = "action=" + type + "&amount=" + amount;
-
-        // Additional data for transfer
-        if (type === 'transfer') {
-            const toCard = document.getElementById('toCard').value;
-            const description = document.getElementById('description').value;
-
-            if (!toCard || !description) {
-                alert('Please fill in all transfer details');
-                return;
-            }
-            data += "&toCard=" + toCard + "&description=" + description;
-        }
-
-        console.log('Sending data:', data);
-
-        // Sending the request to the server
-        fetch('${pageContext.request.contextPath}/user/transaction', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: data
-        })
-            .then(response => {
-                console.log('Response status:', response.status);
-                if (!response.ok) {
-                    throw new Error("Server responded with status" + response.status);
-                }
-                return response.json();
+                alert('Error generating report')
             })
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    fetchBalance(); // Refresh the balance
-                    closeModal(); // Close the modal
-                } else {
-                    alert(data.message || 'Transaction failed');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred during the transaction');
-            });
     }
-
-    // Navigate to change PIN page
-    function showChangePin() {
-        window.location.href = `${pageContext.request.contextPath}/user/changePin`;
-    }
-
-    // Close the modal and reset the form
-    function closeModal() {
-        modal.style.display = 'none';
-        transactionForm.reset();
-    }
-
-    // Close when user clicks the 'X'
-    closeButton.onclick = closeModal;
-
-    // Also close the modal if user clicks outside it
-    window.onclick = function(event) {
-        if (event.target === modal) {
-            closeModal();
-        }
-    };
 
     // Logout function
     function logout() {
@@ -191,11 +168,6 @@
                 console.error('Error:', error);
                 alert('Error during logout');
             });
-    }
-
-    // Helper to capitalize first letter of a word
-    function capitalize(word) {
-        return word.charAt(0).toUpperCase() + word.slice(1);
     }
 </script>
 </body>

@@ -18,7 +18,7 @@ import java.util.List;
 
 @WebServlet("/admin/report")
 public class AdminReportServlet extends BaseServlet {
-    private static Logger logger = LoggerFactory.getLogger(AdminReportServlet.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminReportServlet.class);
     private TransactionDAO transactionDAO;
 
     @Override
