@@ -84,7 +84,7 @@ public class Transaction {
         this.transactionDate = transactionDate;
     }
 
-    public Long getToCard() {
+    public Long getToCardNumber() {
         return toCardNumber;
     }
 

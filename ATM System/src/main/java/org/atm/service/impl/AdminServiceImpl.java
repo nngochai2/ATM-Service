@@ -138,8 +138,28 @@ public class AdminServiceImpl implements AdminService {
         report.setDescription(transaction.getDescription());
 
         if (transaction.getType() == Transaction.TransactionType.TRANSFER) {
-            report.setToCardNumber(transaction.getT);
+            report.setToCardNumber(transaction.getToCardNumber());
         }
         return report;
     }
+
+    @Override
+    public List<TransactionReport> getTransactionReport(String dateStr, Transaction.TransactionType type) throws ATMException {
+        logger.info("Generating {} report for date: {}", type, dateStr);
+        try {
+            Date date = Date.valueOf(dateStr);
+            List<Transaction> transactions = transactionDAO.findByTypeAndDate(type, date);
+
+            return transactions.stream()
+                    .map(this::convertToReport)
+                    .collect(Collectors.toList());
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid date format provided: {}", dateStr, e);
+            throw new ATMException("Invalid date format. Use YYYY-MM-DD", e);
+        } catch (Exception e) {
+            logger.error("Error generating {} report", type, e);
+            throw new ATMException("Error generating report: " + type, e);
+        }
+    }
+
 }

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import org.atm.dao.impl.AdminDAOImpl;
 import org.atm.dao.impl.TransactionDAOImpl;
 import org.atm.dao.impl.UserDAOImpl;
+import org.atm.model.Transaction;
 import org.atm.service.AdminService;
 import org.atm.exception.ATMException;
 import org.atm.service.impl.AdminServiceImpl;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.Date;
 
 @WebServlet("/admin/dashboard")
 public class AdminServlet extends BaseServlet {
@@ -99,7 +101,7 @@ public class AdminServlet extends BaseServlet {
         try {
             switch (reportType) {
                 case "withdrawal":
-                    sendJsonResponse(response, new Gson().toJson(adminService.getWithdrawalReport(date)));
+                    sendJsonResponse(response, new Gson().toJson(adminService.getTransactionReport(date, Transaction.TransactionType.valueOf(reportType))));
                     break;
                 case "deposit":
                     sendJsonResponse(response, new Gson().toJson(adminService.getDepositReport(date)));
