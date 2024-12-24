@@ -72,22 +72,3 @@ public class AdminReportServlet extends BaseServlet {
     }
 }
 
-//   @Override
-//    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        HttpSession session = req.getSession(false);
-//        if (session == null || session.getAttribute("adminUsername") == null) {
-//            sendErrorResponse(resp, "Not authenticated");
-//            return;
-//        }
-//
-//        String type = req.getParameter("type");
-//        String date = req.getParameter("date");
-//
-//        if (type == null || type.isEmpty() || date == null || date.isEmpty()) {
-//            sendErrorResponse(resp, "Both report type and date are required");
-//            return;
-//        }
-//
-
-//    }
-

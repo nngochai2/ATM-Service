@@ -243,6 +243,11 @@ public class TransactionDAOImpl implements TransactionDAO {
         transaction.setAmount(rs.getDouble("amount"));
         transaction.setDescription(rs.getString("description"));
         transaction.setBalanceAfter(rs.getDouble("balance_after"));
+
+        if (transaction.getType() == Transaction.TransactionType.TRANSFER) {
+            transaction.setToCard(rs.getLong("to_card"));
+        }
+
         return transaction;
     }
 
