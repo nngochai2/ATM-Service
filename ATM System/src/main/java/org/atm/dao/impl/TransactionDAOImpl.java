@@ -198,8 +198,8 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     @Override
     public boolean save(Transaction transaction) {
-        String sql = "INSERT INTO transactions (card_number, type, amount, balance_after, description, transaction_date) " +
-                    "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP) RETURNING transaction_id";
+        String sql = "INSERT INTO transactions (card_number, type, amount, balance_after, description, transaction_date, to_card) " +
+                    "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?) RETURNING transaction_id";
 
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -209,6 +209,12 @@ public class TransactionDAOImpl implements TransactionDAO {
             pstmt.setDouble(3, transaction.getAmount());
             pstmt.setDouble(4, transaction.getBalanceAfter());
             pstmt.setString(5, transaction.getDescription());
+
+            if (transaction.getType() == Transaction.TransactionType.TRANSFER) {
+                pstmt.setLong(6, transaction.getToCardNumber());
+            } else {
+                pstmt.setNull(6, Types.BIGINT);
+            }
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
