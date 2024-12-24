@@ -12,8 +12,5 @@ public interface AdminService {
     boolean createUser(String pin, String name, String contactNumber, String gender, String address)
             throws ATMException;
     List<User> getAccountReport() throws ATMException;
-    List<TransactionReport> getWithdrawalReport(String date) throws ATMException;
-    List<TransactionReport> getDepositReport(String date) throws ATMException;
-    List<TransactionReport> getTransferReport(String date) throws ATMException;
     List<TransactionReport> getTransactionReport(String date, Transaction.TransactionType transactionType) throws ATMException;
 }

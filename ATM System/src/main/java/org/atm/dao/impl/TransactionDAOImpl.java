@@ -128,7 +128,7 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public List<Transaction> findByTypeAndDate(Transaction.TransactionType type, Date date) {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE type = ? AND date = ?";
+        String sql = "SELECT * FROM transactions WHERE type = ? AND DATE(transaction_date) = ?";
 
         try (Connection conn = DatabaseUtil.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -238,7 +238,7 @@ public class TransactionDAOImpl implements TransactionDAO {
         Transaction transaction = new Transaction();
         transaction.setTransactionId(rs.getLong("transaction_id"));
         transaction.setCardNumber(rs.getLong("card_number"));
-        transaction.setTransactionDate(rs.getTimestamp("date"));
+        transaction.setTransactionDate(rs.getTimestamp("transaction_date"));
         transaction.setType(Transaction.TransactionType.valueOf(rs.getString("type")));
         transaction.setAmount(rs.getDouble("amount"));
         transaction.setDescription(rs.getString("description"));

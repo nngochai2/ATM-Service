@@ -69,65 +69,6 @@ public class AdminServiceImpl implements AdminService {
             throw new ATMException("Error generating account report", e);
         }
     }
-    @Override
-    public List<TransactionReport> getWithdrawalReport(String dateStr) throws ATMException {
-        logger.info("Generating withdrawal report for date: {}", dateStr);
-        try {
-            Date date = Date.valueOf(dateStr);
-            List<Transaction> withdrawals = transactionDAO.findByTypeAndDate(
-                    Transaction.TransactionType.WITHDRAW, date
-            );
-            return withdrawals.stream()
-                    .map(this::convertToReport)
-                    .collect(Collectors.toList());
-        } catch (IllegalArgumentException e) {
-            logger.error("Invalid date format provided: {}", dateStr, e);
-            throw new ATMException("Invalid date format. Use YYYY-MM-DD", e);
-        } catch (Exception e) {
-            logger.error("Error generating withdrawal report", e);
-            throw new ATMException("Error generating withdrawal report", e);
-        }
-    }
-
-    @Override
-    public List<TransactionReport> getDepositReport(String dateStr) throws ATMException {
-        logger.info("Generating deposit report for date: {}", dateStr);
-        try {
-            Date date = Date.valueOf(dateStr);
-            List<Transaction> deposits = transactionDAO.findByTypeAndDate(
-                    Transaction.TransactionType.DEPOSIT, date);
-
-            return deposits.stream()
-                    .map(this::convertToReport)
-                    .collect(Collectors.toList());
-        } catch (IllegalArgumentException e) {
-            logger.error("Invalid date format provided: {}", dateStr, e);
-            throw new ATMException("Invalid date format. Use YYYY-MM-DD", e);
-        } catch (Exception e) {
-            logger.error("Error generating deposit report", e);
-            throw new ATMException("Error generating deposit report", e);
-        }
-    }
-
-    @Override
-    public List<TransactionReport> getTransferReport(String dateStr) throws ATMException {
-        logger.info("Generating transfer report for date: {}", dateStr);
-        try {
-            Date date = Date.valueOf(dateStr);
-            List<Transaction> transfers = transactionDAO.findByTypeAndDate(
-                    Transaction.TransactionType.TRANSFER, date);
-
-            return transfers.stream()
-                    .map(this::convertToReport)
-                    .collect(Collectors.toList());
-        } catch (IllegalArgumentException e) {
-            logger.error("Invalid date format provided: {}", dateStr, e);
-            throw new ATMException("Invalid date format. Use YYYY-MM-DD", e);
-        } catch (Exception e) {
-            logger.error("Error generating transfer report", e);
-            throw new ATMException("Error generating transfer report", e);
-        }
-    }
 
     private TransactionReport convertToReport(Transaction transaction) {
         TransactionReport report = new TransactionReport();
@@ -161,5 +102,4 @@ public class AdminServiceImpl implements AdminService {
             throw new ATMException("Error generating report: " + type, e);
         }
     }
-
 }

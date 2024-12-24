@@ -22,29 +22,58 @@
         </div>
 
         <!-- Grid of action cards -->
-        <div class="actions-grid">
-            <div class="action-card" onclick="showTransactionForm('withdraw')">
+        <div id="reportButtons" class="actions-grid">
+            <div class="action-card" onclick="showReport('withdraw')">
                 <h3>Withdraw Report</h3>
                 <p>Get withdraw report</p>
             </div>
 
-            <div class="action-card" onclick="showTransactionForm('deposit')">
+            <div class="action-card" onclick="showReport('deposit')">
                 <h3>Deposit Report</h3>
                 <p>Get deposit report</p>
             </div>
 
-            <div class="action-card" onclick="showTransactionForm('transfer')">
+            <div class="action-card" onclick="showReport('transfer')">
                 <h3>Transfer Report</h3>
                 <p>Get transfer report</p>
             </div>
 
-            <div class="action-card" onclick="showChangePin()">
+            <div class="action-card" onclick="showReport('account')">
                 <h3>Account Report</h3>
                 <p>View list of all register user</p>
             </div>
         </div>
 
-        <!-- Modal for transaction form -->
+
+        <!-- Report View (Initially Hidden) -->
+        <div id="reportView" class="card" style="display: none;">
+            <div class="card-header">
+                <div class="report-header">
+                    <button onclick="showDashboard()" class="btn-secondary">Back to Dashboard</button>
+                    <h2 id="reportTitle"></h2>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="report-controls">
+                    <div class="date-filter">
+                        <label for="reportDate">Select Date:</label>
+                        <input type="date" id="reportDate" class="form-control" value="${currentDate}">
+                        <button onclick="generateReport()" class="btn btn-primary">Generate</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="reportTable" class="report-table">
+                        <thead>
+                        <!-- Headers will be set dynamically -->
+                        </thead>
+                        <tbody>
+                        <!-- Data will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -58,7 +87,6 @@
         document.getElementById('reportButtons').style.display = 'none';
         document.getElementById('reportView').style.display = 'block';
 
-        // Set report title
         const titles = {
             'withdraw': 'Withdrawal Report',
             'deposit': 'Deposit Report',
@@ -67,15 +95,13 @@
         };
         document.getElementById('reportTitle').textContent = titles[type];
 
-        // Initialize the table based on report type
-        initalizeTable(type);
-        generateReport();
+        initializeTable(type);
+        generateReport(type);
     }
 
     function showDashboard() {
         document.getElementById('reportButtons').style.display = 'block';
         document.getElementById('reportView').style.display = 'none';
-
         if (reportTable) {
             reportTable.destroy();
         }
@@ -83,39 +109,23 @@
 
     function initializeTable(type) {
         const columns = getColumnsForType(type);
-
         if (reportTable) {
             reportTable.destroy();
         }
-
-        reportTable = ${'#reportTable'}.DataTable({
+        reportTable = $('#reportTable').DataTable({
             columns: columns,
             order: [[0, 'desc']],
             pageLength: 10,
             responsive: true
-        })
+        });
     }
 
     function getColumnsForType(type) {
         const commonColumns = [
-            {
-                data: 'transactionDate',
-                title: 'Date/Time'
-            },
-            {
-                data: 'cardNumber',
-                title: 'Card Number'
-            },
-            {
-                data: 'amount',
-                title: 'Amount',
-                render: data => '$' + Number(data).toFixed(2)
-            },
-            {
-                data: 'balanceAfter',
-                title: 'Balance After',
-                render: data => '$' + Number(data).toFixed(2)
-            }
+            { data: 'transactionDate', title: 'Date/Time' },
+            { data: 'cardNumber', title: 'Card Number' },
+            { data: 'amount', title: 'Amount', render: data => '$' + Number(data).toFixed(2) },
+            { data: 'balanceAfter', title: 'Balance After', render: data => '$' + Number(data).toFixed(2) }
         ];
 
         if (type === 'account') {
@@ -124,24 +134,28 @@
                 { data: 'cardNumber', title: 'Card Number' },
                 { data: 'name', title: 'Name' },
                 { data: 'contactNumber', title: 'Contact' },
-                { data: 'balance', title: 'Balance',
-                    render: data => '$' + Number(data).toFixed(2) }
+                { data: 'balance', title: 'Balance', render: data => '$' + Number(data).toFixed(2) }
             ];
         } else if (type === 'transfer') {
             return [
                 ...commonColumns,
+                { data: 'toCardNumber', title: 'To Card Number' },
                 { data: 'description', title: 'Description' }
             ];
         }
-
         return commonColumns;
     }
 
     function generateReport() {
-        const date = document.getElementById('reportDate').value;
+        const date = document.getElementById('reportDate').value
 
-        fetch(`${pageContext.request.contextPath}/admin/report?` +
-            'type=' + currentReportType + '&date=' + date)
+        // Validate the current report type
+        if (!currentReportType) {
+            alert('Report type is not set');
+            return;
+        }
+
+        fetch(`${pageContext.request.contextPath}/admin/report?type=` + currentReportType + `&date=` + date)
             .then(response => response.json())
             .then(data => {
                 reportTable.clear();
@@ -150,23 +164,14 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error generating report')
-            })
+                alert('Error generating report');
+            });
     }
 
-    // Logout function
     function logout() {
         fetch('${pageContext.request.contextPath}/logout')
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = '${pageContext.request.contextPath}/';
-                } else {
-                    throw new Error('Logout failed');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error during logout');
+            .then(() => {
+                window.location.href = '${pageContext.request.contextPath}/';
             });
     }
 </script>
