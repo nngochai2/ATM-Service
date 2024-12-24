@@ -46,14 +46,12 @@ public class UserServiceImpl implements UserService {
             double newBalance = user.getBalance() + amount;
 
             if (userDAO.updateBalance(cardNumber, newBalance)) {
-                // Create transaction without ID
-                Transaction transaction = new Transaction(
-                        cardNumber,
-                        Transaction.TransactionType.DEPOSIT,
-                        amount,
-                        newBalance,
-                        "Deposit"
-                );
+                Transaction transaction = new Transaction();
+                transaction.setCardNumber(cardNumber);
+                transaction.setType(Transaction.TransactionType.DEPOSIT);
+                transaction.setAmount(amount);
+                transaction.setBalanceAfter(newBalance);
+                transaction.setDescription("Deposit");
 
                 return transactionDAO.save(transaction);
             }
@@ -83,15 +81,15 @@ public class UserServiceImpl implements UserService {
             }
 
             double newBalance = user.getBalance() - amount;
+
             if (userDAO.updateBalance(cardNumber, newBalance)) {
-                // Save the transaction
-                Transaction transaction = new Transaction(
-                        cardNumber,
-                        Transaction.TransactionType.WITHDRAW,
-                        amount,
-                        newBalance,
-                        "Withdrawal"
-                );
+                Transaction transaction = new Transaction();
+                transaction.setCardNumber(cardNumber);
+                transaction.setType(Transaction.TransactionType.WITHDRAW);
+                transaction.setAmount(amount);
+                transaction.setBalanceAfter(newBalance);
+                transaction.setDescription("Withdrawal");
+
                 return transactionDAO.save(transaction);
             }
             return false;
@@ -135,14 +133,13 @@ public class UserServiceImpl implements UserService {
                 User user = userDAO.findByCardNumber(toCard);
                 double newBalance = user.getBalance() + amount;
                 if (userDAO.updateBalance(toCard, newBalance)) {
-                    // Create transaction with custom description
-                    Transaction transaction = new Transaction(
-                            toCard,
-                            Transaction.TransactionType.TRANSFER,
-                            amount,
-                            newBalance,
-                            transferDescription
-                    );
+                    Transaction transaction = new Transaction();
+                    transaction.setCardNumber(fromCard);
+                    transaction.setToCard(toCard);
+                    transaction.setType(Transaction.TransactionType.TRANSFER);
+                    transaction.setAmount(amount);
+                    transaction.setBalanceAfter(newBalance);
+                    transaction.setDescription("Transfer to " + toCard.toString());
                     transactionDAO.save(transaction);
                     return true;
                 }

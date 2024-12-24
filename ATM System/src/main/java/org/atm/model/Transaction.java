@@ -11,6 +11,7 @@ public class Transaction {
     private Long transactionId;
     private Long cardNumber;
     private TransactionType type;
+    private Long toCardNumber; // For transfers
     private double amount;
     private double balanceAfter;
     private String description;
@@ -18,9 +19,10 @@ public class Transaction {
 
     public Transaction() {}
 
-    public Transaction(Long cardNumber, TransactionType type, double amount, double balanceAfter, String description) {
+    public Transaction(Long cardNumber, TransactionType type, Long toCardNumber, double amount, double balanceAfter, String description) {
         this.cardNumber = cardNumber;
         this.type = type;
+        this.toCardNumber = toCardNumber;
         this.amount = amount;
         this.balanceAfter = balanceAfter;
         this.description = description;
@@ -80,5 +82,13 @@ public class Transaction {
 
     public void setTransactionDate(Timestamp transactionDate) {
         this.transactionDate = transactionDate;
+    }
+
+    public Long getToCard() {
+        return toCardNumber;
+    }
+
+    public void setToCard(Long toCardNumber) {
+        this.toCardNumber = toCardNumber;
     }
 }

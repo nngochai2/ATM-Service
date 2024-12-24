@@ -136,6 +136,10 @@ public class AdminServiceImpl implements AdminService {
         report.setBalanceAfter(transaction.getBalanceAfter());
         report.setTransactionDate(transaction.getTransactionDate());
         report.setDescription(transaction.getDescription());
+
+        if (transaction.getType() == Transaction.TransactionType.TRANSFER) {
+            report.setToCardNumber(transaction.getT);
+        }
         return report;
     }
 }
