@@ -97,8 +97,11 @@
         reportTable = $('#reportTable').DataTable({
             columns: columns,
             order: [[0, 'desc']],
-            pageLength: 10,
-            responsive: true
+            // pageLength: 10,
+            responsive: true,
+            dom: 't<"bottom">', // This shows only table and pagination
+            searching: false,     // Removes the search box
+            lengthChange: false  // Removes the entries per page dropdown
         });
     }
 
