@@ -1,5 +1,7 @@
 package org.atm.model;
 
+import java.util.List;
+
 public class User {
     private String userId;      // Primary key, unique identification number
     private String name;
@@ -9,6 +11,7 @@ public class User {
     private String address;
     private String contactNumber;
     private double balance;
+    private List<Transaction> transactions;
 
     public User(){}
 
@@ -85,5 +88,13 @@ public class User {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 }

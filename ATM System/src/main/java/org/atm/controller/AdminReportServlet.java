@@ -10,7 +10,9 @@ import org.atm.dao.impl.AdminDAOImpl;
 import org.atm.dao.impl.TransactionDAOImpl;
 import org.atm.dao.impl.UserDAOImpl;
 import org.atm.dto.TransactionReport;
+import org.atm.exception.ATMException;
 import org.atm.model.Transaction;
+import org.atm.model.User;
 import org.atm.service.AdminService;
 import org.atm.service.impl.AdminServiceImpl;
 import org.slf4j.Logger;
@@ -53,6 +55,16 @@ public class AdminReportServlet extends BaseServlet {
             if (date == null || date.isEmpty()) {
                 sendErrorResponse(resp, "Report date is required");
                 return;
+            }
+
+            if (type.equals("account")) {
+                try {
+                    List<User> accounts = adminService.getAccountReport();
+                    Gson gson = new Gson();
+                    sendErrorResponse(resp, gson.toJson(accounts));
+                } catch (Exception e) {
+                    sendErrorResponse(resp, e.getMessage());
+                }
             }
 
             try {
