@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @WebServlet("/admin/report")
@@ -39,36 +40,44 @@ public class AdminReportServlet extends BaseServlet {
 
         String type = req.getParameter("type");
         String date = req.getParameter("date");
-        if (type == null || type.isEmpty() || date == null || date.isEmpty()) {
-            sendErrorResponse(resp, "Both report type and date are required");
-            return;
-        }
 
-        try {
-            Transaction.TransactionType transactionType;
-            switch (type.toLowerCase()) {
-                case "withdraw":
-                    transactionType = Transaction.TransactionType.WITHDRAW;
-                    break;
-                case "deposit":
-                    transactionType = Transaction.TransactionType.DEPOSIT;
-                    break;
-                case "transfer":
-                    transactionType = Transaction.TransactionType.TRANSFER;
-                    break;
-                default:
-                    sendErrorResponse(resp, "Invalid report type");
-                    return;
+        // Check if it's an AJAX request
+        boolean isAjax = "XMLHttpRequest".equals(req.getHeader("X-Requested-With"));
+
+        if (isAjax) {
+            // Handle AJAX request - return JSON
+            if (type == null || type.isEmpty()) {
+                sendErrorResponse(resp, "Report type is required");
+                return;
+            }
+            if (date == null || date.isEmpty()) {
+                sendErrorResponse(resp, "Report date is required");
+                return;
             }
 
-            List<TransactionReport> reports = adminService.getTransactionReport(date, transactionType);
-
-            // Convert the reports to JSON and send the response
-            Gson gson = new Gson();
-            sendJsonResponse(resp, gson.toJson(reports));
-        } catch (Exception e) {
-            sendErrorResponse(resp, e.getMessage());
+            try {
+                Transaction.TransactionType transactionType = getTransactionType(type);
+                List<TransactionReport> reports = adminService.getTransactionReport(date, transactionType);
+                Gson gson = new Gson();
+                sendJsonResponse(resp, gson.toJson(reports));
+            } catch (Exception e) {
+                sendErrorResponse(resp, e.getMessage());
+            }
+        } else {
+            // Handle page load - forward to JSP
+            req.setAttribute("currentDate", LocalDate.now());
+            req.getRequestDispatcher("/WEB-INF/views/admin/report.jsp")
+                    .forward(req, resp);
         }
+    }
+
+    private Transaction.TransactionType getTransactionType(String type) {
+        return switch (type.toLowerCase()) {
+            case "withdraw" -> Transaction.TransactionType.WITHDRAW;
+            case "deposit" -> Transaction.TransactionType.DEPOSIT;
+            case "transfer" -> Transaction.TransactionType.TRANSFER;
+            default -> throw new IllegalArgumentException("Invalid report type: " + type);
+        };
     }
 }
 

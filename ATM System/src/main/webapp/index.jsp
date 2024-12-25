@@ -24,10 +24,10 @@
             <a href="${pageContext.request.contextPath}/login/admin" class="btn btn-primary">Admin Login</a>
         </div>
 
-        <div class="note">
-            <p><a href="${pageContext.request.contextPath}/help.jsp">Need help?</a> |
-                <a href="${pageContext.request.contextPath}/about.jsp">About Us</a></p>
-        </div>
+<%--        <div class="note">--%>
+<%--            <p><a href="${pageContext.request.contextPath}/help.jsp">Need help?</a> |--%>
+<%--                <a href="${pageContext.request.contextPath}/about.jsp">About Us</a></p>--%>
+<%--        </div>--%>
     </div>
 </div>
 </body>
