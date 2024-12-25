@@ -1,5 +1,6 @@
 package org.atm.service;
 
+import org.atm.dto.TransactionReport;
 import org.atm.model.Transaction;
 
 import java.sql.Date;

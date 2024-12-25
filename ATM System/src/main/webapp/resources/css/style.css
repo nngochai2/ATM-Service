@@ -405,3 +405,25 @@ input {
     margin-top: 0.5rem;
 }
 
+.text-red {
+    color: #dc3545;
+}
+
+.text-green {
+    color: #28a745;
+}
+
+.balance-section {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.balance-amount {
+    font-size: 24px;
+    font-weight: bold;
+    color: #28a745;
+}
+

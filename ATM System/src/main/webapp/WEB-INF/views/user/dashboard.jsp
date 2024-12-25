@@ -16,7 +16,7 @@
     <!-- Main content area -->
     <div class="main-content">
         <!-- Balance section in a "card" style container -->
-        <div class="card balance-section">
+        <div class="card balance-section" onclick="showHistory()">
             <h3>Current Balance</h3>
             <div id="balanceAmount" class="balance-amount">$0.00</div>
         </div>
@@ -184,6 +184,11 @@
                 console.error('Error:', error);
                 alert('An error occurred during the transaction');
             });
+    }
+
+    // Navigate to transaction history page
+    function showHistory() {
+        window.location.href =  `${pageContext.request.contextPath}/user/history`;
     }
 
     // Navigate to change PIN page

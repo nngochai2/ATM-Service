@@ -109,6 +109,7 @@
                 console.error('Error:', error);
                 alert('Error changing PIN');
             });
-    });</script>
+    });
+</script>
 </body>
 </html>

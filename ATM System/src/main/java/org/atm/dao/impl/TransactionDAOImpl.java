@@ -17,7 +17,7 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public List<Transaction> findByCardNumber(Long cardNumber) {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE card_number = ? ORDER BY date DESC";
+        String sql = "SELECT * FROM transactions WHERE card_number = ? ORDER BY transaction_date DESC LIMIT 5";
 
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -60,7 +60,7 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public List<Transaction> findByCardNumberAndDate(Long cardNumber, Date date) {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE card_number = ? AND date = ?";
+        String sql = "SELECT * FROM transactions WHERE card_number = ? AND transaction_date = ?";
 
         try (Connection conn = DatabaseUtil.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
