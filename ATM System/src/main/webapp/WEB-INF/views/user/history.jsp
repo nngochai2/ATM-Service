@@ -136,5 +136,16 @@
             });
     }
 </script>
+
+<style>
+    .text-red {
+        color: #dc3545;
+    }
+
+    .text-green {
+        color: #28a745;
+    }
+</style>
+
 </body>
 </html>
