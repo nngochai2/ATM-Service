@@ -51,6 +51,7 @@
         // Fetch report type from URL query parameters
         let reportType = new URLSearchParams(window.location.search).get('type');
         let reportTable;
+        const contextPath = '/ATM-System';
 
         document.addEventListener('DOMContentLoaded', function () {
             initializeReport();
@@ -128,62 +129,43 @@
         }
 
         function generateReport() {
-            let date = document.getElementById('reportDate').value;
-
             // Validate inputs
             if (!reportType) {
                 alert('Report type is not set');
                 return;
             }
 
-            if (reportType === 'account') {
-                fetch('${pageContext.request.contextPath}/admin/report?type=' + reportType, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch report');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (reportTable) {
-                            reportTable.clear();
-                            reportTable.rows.add(data);
-                            reportTable.draw();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error generating report: ' + error.message);
-                    });
-            } else {
-                // Add headers to indicate this is an AJAX request
-                fetch('${pageContext.request.contextPath}/admin/report?type=' + reportType + '&date=' + date, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch report');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (reportTable) {
-                            reportTable.clear();
-                            reportTable.rows.add(data);
-                            reportTable.draw();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error generating report: ' + error.message);
-                    });
+            let url = '${pageContext.request.contextPath}' + '/admin/report?type=' + reportType;
+
+            // Add date parameter only for non-account reports
+            if (reportType !== 'account') {
+                const date = document.getElementById('reportDate').value;
+                url += '&date=' + date;
             }
+
+            // Make the API call
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch report');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (reportTable) {
+                        reportTable.clear();
+                        reportTable.rows.add(data);
+                        reportTable.draw();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error generating report: ' + error.message);
+                });
         }
 
         function backToDashboard() {

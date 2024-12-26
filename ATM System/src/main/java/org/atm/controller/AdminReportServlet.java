@@ -51,27 +51,27 @@ public class AdminReportServlet extends BaseServlet {
                 sendErrorResponse(resp, "Report type is required");
                 return;
             }
-            if (date == null || date.isEmpty()) {
-                sendErrorResponse(resp, "Report date is required");
-                return;
-            }
-
-            if (type.equalsIgnoreCase("account")) {
-                try {
-                    List<User> accounts = adminService.getAccountReport();
-                    Gson gson = new Gson();
-                    sendErrorResponse(resp, gson.toJson(accounts));
-                } catch (Exception e) {
-                    sendErrorResponse(resp, e.getMessage());
-                }
-            }
 
             try {
+                if (type.equalsIgnoreCase("account")) {
+                    List<User> accounts = adminService.getAccountReport();
+                    Gson gson = new Gson();
+                    sendJsonResponse(resp, gson.toJson(accounts));
+                    return;
+                }
+
+                // For other reports, we need date
+                if (date == null || date.isEmpty()) {
+                    sendErrorResponse(resp, "Report date is required");
+                    return;
+                }
+
                 Transaction.TransactionType transactionType = getTransactionType(type);
                 List<TransactionReport> reports = adminService.getTransactionReport(date, transactionType);
                 Gson gson = new Gson();
                 sendJsonResponse(resp, gson.toJson(reports));
             } catch (Exception e) {
+                logger.error("Error generating report", e);
                 sendErrorResponse(resp, e.getMessage());
             }
         } else {
