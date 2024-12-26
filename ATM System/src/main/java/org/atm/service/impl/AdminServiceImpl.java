@@ -38,24 +38,35 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public boolean createUser(String pin, String name, String contactNumber, String gender, String address)
-            throws ATMException {
+    public void createUser(User user) throws ATMException {
         try {
-            // Generate user ID
-            String userId = userDAO.getLatestUserId();
+            // Validate user input
+            if (user.getPin() == null || !user.getPin().matches("\\d{4}")) {
+                throw new ATMException("PIN must be 4 digits");
+            }
+            if (user.getName() == null || user.getName().trim().isEmpty()) {
+                throw new ATMException("Name is required");
+            }
+            if (user.getContactNumber() == null || user.getContactNumber().trim().isEmpty()) {
+                throw new ATMException("Contact number is required");
+            }
+            if (user.getGender() == null || user.getGender().trim().isEmpty()) {
+                throw new ATMException("Gender is required");
+            }
+            if (user.getAddress() == null || user.getAddress().trim().isEmpty()) {
+                throw new ATMException("Address is required");
+            }
 
-            // Generate card user
-            Long cardNumber = userDAO.getLatestCardNumber() + 1;
+            // Save the user
+            if (!userDAO.save(user)) {
+                throw new ATMException("Failed to create customer");
+            }
 
-            // Create new user with generated ID
-            User newUser = new User();
-            newUser.setUserId(userId);
-            newUser.setCardNumber(cardNumber);
-            //
-            return userDAO.save(newUser);
+            logger.info("Successfully created new user {} with card number {}", user.getName(), user.getCardNumber());
+
         } catch (Exception e) {
-            logger.error("Error creating user", e);
-            throw new ATMException("Error creating user: " + e.getMessage());
+            logger.error("Error creating customer", e);
+            throw new ATMException("Failed to create customer: " + e.getMessage());
         }
     }
 
