@@ -56,7 +56,7 @@ public class AdminReportServlet extends BaseServlet {
                 return;
             }
 
-            if (type.equals("account")) {
+            if (type.equalsIgnoreCase("account")) {
                 try {
                     List<User> accounts = adminService.getAccountReport();
                     Gson gson = new Gson();

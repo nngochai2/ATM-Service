@@ -106,7 +106,7 @@
     // Show the transaction modal and configure the form
     function showTransactionForm(type) {
         const amount = document.getElementById('amount').value;
-        console.log(`Action:`, type, `Amount:`, amount)
+        console.log(`Action:`, type, `Amount:`, amount) // Log for testing
 
         // Update the modal title based on the action
         modalTitle.textContent = capitalize(type);

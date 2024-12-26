@@ -61,7 +61,6 @@
         </div>
     </div>
 
-    <!-- AJAX login logic -->
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -78,6 +77,7 @@
                 body: urlEncodedData
             })
                 .then(response => response.json())
+
                 // Processes the Server's response
                 .then(data => {
                     if (data.success) {
