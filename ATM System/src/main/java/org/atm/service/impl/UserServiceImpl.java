@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
                 Transaction transaction = new Transaction();
                 transaction.setCardNumber(cardNumber);
                 transaction.setType(Transaction.TransactionType.WITHDRAW);
-                transaction.setAmount(amount);
+                transaction.setAmount(-amount);
                 transaction.setBalanceAfter(newBalance);
                 transaction.setDescription("Withdrawal");
 
@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService {
     public boolean transferMoney(Long fromCard, Long toCard, double amount, String description)
             throws ATMException {
         try {
+            User sender = userDAO.findByCardNumber(fromCard);
             // Check if the recipient exists
             User recipient = userDAO.findByCardNumber(toCard);
             if (recipient == null) {
@@ -123,37 +124,40 @@ public class UserServiceImpl implements UserService {
                 ? description
                 : "Transfer to " + toCard);
 
-            // Withdraw from sender
-            if (!withdraw(fromCard, amount)) {
-                throw new ATMException("Error withdrawing from sender account");
+            // Update sender's balance
+            double senderNewBalance = sender.getBalance() - amount;
+            if (!userDAO.updateBalance(fromCard, senderNewBalance)) {
+                throw new ATMException("Error updating sender's balance");
             }
 
-            // Deposit to receiver
-            try {
-                User user = userDAO.findByCardNumber(toCard);
-                double newBalance = user.getBalance() + amount;
-                if (userDAO.updateBalance(toCard, newBalance)) {
-                    Transaction transaction = new Transaction();
-                    transaction.setCardNumber(fromCard);
-                    transaction.setToCard(toCard);
-                    transaction.setType(Transaction.TransactionType.TRANSFER);
-                    transaction.setAmount(amount);
-                    transaction.setBalanceAfter(newBalance);
-                    transaction.setDescription(transferDescription);
-                    transactionDAO.save(transaction);
-                    return true;
-                }
-
-                // If deposit fails, rollback withdrawal
-                User sender = userDAO.findByCardNumber(fromCard);
-                userDAO.updateBalance(fromCard, sender.getBalance() + amount);
-                throw new ATMException("Error completing transfer");
-            } catch (Exception e) {
-                // Rollback withdrawal if deposit fails
-                User sender = userDAO.findByCardNumber(fromCard);
-                userDAO.updateBalance(fromCard, sender.getBalance() + amount);
-                throw new ATMException("Error completing transfer");
+            // Update recipient's balance
+            double recipientNewBalance = recipient.getBalance() + amount;
+            if (!userDAO.updateBalance(toCard, recipientNewBalance)) {
+                // Rollback sender's balance
+                userDAO.updateBalance(fromCard, sender.getBalance());
+                throw new ATMException("Error updating recipient's balance");
             }
+
+            // Create sender's transaction (negative amount)
+            Transaction senderTransaction = new Transaction();
+            senderTransaction.setCardNumber(fromCard);
+            senderTransaction.setToCard(toCard);
+            senderTransaction.setType(Transaction.TransactionType.TRANSFER);
+            senderTransaction.setAmount(-amount);  // Negative for sender
+            senderTransaction.setBalanceAfter(senderNewBalance);
+            senderTransaction.setDescription(transferDescription);
+            transactionDAO.save(senderTransaction);
+
+            // Create recipient's transaction (positive amount)
+            Transaction recipientTransaction = new Transaction();
+            recipientTransaction.setCardNumber(toCard);
+            recipientTransaction.setToCard(fromCard);
+            recipientTransaction.setType(Transaction.TransactionType.TRANSFER);
+            recipientTransaction.setAmount(amount);  // Positive for recipient
+            recipientTransaction.setBalanceAfter(recipientNewBalance);
+            recipientTransaction.setDescription("Transfer from " + fromCard);
+
+            return transactionDAO.save(recipientTransaction);
         } catch (Exception e) {
             throw new ATMException("Error processing transfer", e);
         }

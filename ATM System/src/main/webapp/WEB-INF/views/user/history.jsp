@@ -61,12 +61,11 @@
                 { data: 'type', title: 'Type' },
                 {
                     data: 'amount',
-                    title: 'Amount',
+                    title: 'Amount ($)',
                     render: function(data, type, row) {
                         const amount = Number(data).toFixed(2);
-                        const prefix = row.type === 'WITHDRAW' ? '-' : '+';
                         const colorClass = row.type === 'WITHDRAW' ? 'text-red' : 'text-green';
-                        return "<span class='" + colorClass + "'>" + prefix + "$" + amount + "</span>";
+                        return "<span class='" + colorClass + "'>" + amount + "</span>";
                     }
                 },
                 { data: 'description', title: 'Description' },
