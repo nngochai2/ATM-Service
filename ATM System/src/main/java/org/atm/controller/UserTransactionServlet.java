@@ -127,6 +127,7 @@ public class UserTransactionServlet extends BaseServlet {
                         sendErrorResponse(response, "Recipient card number is required");
                         return;
                     }
+
                     Long toCard = Long.valueOf(toCardStr);
                     String description = request.getParameter("description");
 

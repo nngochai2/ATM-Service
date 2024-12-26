@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
                     transaction.setType(Transaction.TransactionType.TRANSFER);
                     transaction.setAmount(amount);
                     transaction.setBalanceAfter(newBalance);
-                    transaction.setDescription("Transfer to " + toCard.toString());
+                    transaction.setDescription(transferDescription);
                     transactionDAO.save(transaction);
                     return true;
                 }
@@ -158,32 +158,6 @@ public class UserServiceImpl implements UserService {
             throw new ATMException("Error processing transfer", e);
         }
     }
-//
-//            // Deposit to recipient
-//            try {
-//                User user = userDAO.findByCardNumber(toCard);
-//                double newBalance = user.getBalance() + amount;
-//                if (userDAO.updateBalance(toCard, newBalance)) {
-//                    Transaction transaction = new Transaction(toCard, Transaction.TransactionType.TRANSFER,
-//                                                           amount, newBalance, "Transfer from " + fromCard);
-//                    transactionDAO.save(transaction);
-//                    return true;
-//                }
-//                // If deposit fails, rollback withdrawal
-//                User sender = userDAO.findByCardNumber(fromCard);
-//                userDAO.updateBalance(fromCard, sender.getBalance() + amount);
-//                throw new ATMException("Error completing transfer");
-//            } catch (Exception e) {
-//                // Rollback withdrawal if deposit fails
-//                User sender = userDAO.findByCardNumber(fromCard);
-//                userDAO.updateBalance(fromCard, sender.getBalance() + amount);
-//                throw new ATMException("Error completing transfer", e);
-//            }
-//        } catch (Exception e) {
-//            throw new ATMException("Error processing transfer", e);
-//        }
-//    }
-//}
 
     @Override
     public boolean changePin(Long cardNumber, String oldPin, String newPin) throws ATMException {
