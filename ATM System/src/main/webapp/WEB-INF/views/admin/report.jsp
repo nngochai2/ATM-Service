@@ -42,6 +42,50 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Create Customer Modal -->
+            <div id="createCustomerModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeCreateCustomerModal()">&times;</span>
+                    <h2>Create New Customer</h2>
+
+                    <form id="createCustomerForm" onsubmit="handleCreateCustomer(event)">
+                        <div class="form-group">
+                            <label for="name">Full Name: *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pin">PIN: *</label>
+                            <input type="password" id="pin" name="pin" pattern="\d{4}"
+                                   title="PIN must be 4 digits" required>
+                            <small>4-digit number</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gender">Gender: *</label>
+                            <select id="gender" name="gender" required>
+                                <option value="">Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Address: *</label>
+                            <textarea id="address" name="address" rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contactNumber">Contact Number: *</label>
+                            <input type="tel" id="contactNumber" name="contactNumber" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Create Customer</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -52,6 +96,7 @@
         let reportType = new URLSearchParams(window.location.search).get('type');
         let reportTable;
         const contextPath = '/ATM-System';
+        const modal = document.getElementById('createCustomerModal');
 
         document.addEventListener('DOMContentLoaded', function () {
             initializeReport();
@@ -72,6 +117,21 @@
             };
 
             document.getElementById('reportTitle').textContent = titles[reportType] || 'Report';
+
+            // Show create customer button only for account report
+            if (reportType === 'account') {
+                const reportHeader = document.querySelector('.report-header');
+                const backButton = document.querySelector('.btn-secondary');
+
+                // Create and insert the button before the back button
+                const createButton = document.createElement('button');
+                createButton.onclick = showCreateCustomerModal;
+                createButton.className = 'btn btn-primary';
+                createButton.style.marginRight = '10px';  // Add some spacing
+                createButton.textContent = 'Create Customer';
+
+                backButton.parentNode.insertBefore(createButton, backButton);
+            }
 
             // Initialize the table and generate the initial report
             initializeTable(reportType);
@@ -160,11 +220,62 @@
                         reportTable.clear();
                         reportTable.rows.add(data);
                         reportTable.draw();
+                        closeCreateCustomerModal()
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('Error generating report: ' + error.message);
+                });
+        }
+
+        function showCreateCustomerModal() {
+            document.getElementById('createCustomerModal').style.display = 'block';
+        }
+
+        function closeCreateCustomerModal() {
+            document.getElementById('createCustomerModal').style.display = 'none';
+            document.getElementById('createCustomerForm').reset();
+        }
+
+        function handleCreateCustomer(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                pin: document.getElementById('pin').value.trim(),
+                gender: document.getElementById('gender').value,
+                address: document.getElementById('address').value.trim(),
+                contactNumber: document.getElementById('contactNumber').value.trim()
+            };
+
+            // Basic validation
+            if (!formData.pin.match(/^\d{4}$/)) {
+                alert('PIN must be exactly 4 digits');
+                return;
+            }
+
+            fetch(contextPath + '/admin/report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Customer created successfully');
+                        closeCreateCustomerModal();
+                        generateReport(); // Refresh the table
+                    } else {
+                        alert(data.message || 'Failed to create customer');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error creating customer: ' + error.message);
                 });
         }
 
@@ -181,6 +292,14 @@
                     console.error('Error during logout:', error);
                     alert('Error during logout.');
                 });
+        }
+
+        // Add window click event to close modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('createCustomerModal');
+            if (event.target === modal) {
+                closeCreateCustomerModal();
+            }
         }
     </script>
 </body>

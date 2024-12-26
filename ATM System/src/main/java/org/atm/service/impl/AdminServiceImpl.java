@@ -50,6 +50,10 @@ public class AdminServiceImpl implements AdminService {
             if (user.getContactNumber() == null || user.getContactNumber().trim().isEmpty()) {
                 throw new ATMException("Contact number is required");
             }
+            // Validate contact number is numeric
+            if (!user.getContactNumber().matches("\\d+")) {
+                throw new ATMException("Contact number must contain only digits");
+            }
             if (user.getGender() == null || user.getGender().trim().isEmpty()) {
                 throw new ATMException("Gender is required");
             }

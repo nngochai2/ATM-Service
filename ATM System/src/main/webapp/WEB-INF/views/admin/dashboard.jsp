@@ -18,7 +18,7 @@
         <!-- Welcome Section -->
         <div class="card balance-section">
             <h3>Welcome Admin</h3>
-            <div id="adminName" class="balance-amount">Admin</div>
+            <div id="adminName" class="admin-title">Admin</div>
         </div>
 
         <!-- Report Options -->

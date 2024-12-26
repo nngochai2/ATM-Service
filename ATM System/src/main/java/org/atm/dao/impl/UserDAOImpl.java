@@ -76,20 +76,20 @@ public class UserDAOImpl implements UserDAO {
         String sql = "SELECT user_id FROM users ORDER BY user_id DESC LIMIT 1";
 
         try (Connection conn = DatabaseUtil.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
 
             if (rs.next()) {
-                String latestId = rs.getString("user_id");
-                // Extract number part and increment
-                int number = Integer.parseInt(latestId.substring((3)) + 1);
-                return String.format("USR%06d", number);
+                int latestId = rs.getInt("user_id");
+                return String.valueOf(latestId + 1);
             }
-             // First user
+            // First user
+            return "1";
+
         } catch (SQLException e) {
             logger.error("Error getting latest user ID", e);
+            return "1";
         }
-        return "USR000001";
     }
 
     @Override
@@ -170,21 +170,26 @@ public class UserDAOImpl implements UserDAO {
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, "user_id");
-            pstmt.setString(2, "name");
-            pstmt.setString(3, "card_number");
-            pstmt.setString(4, "pin");
-            pstmt.setString(5, "gender");
-            pstmt.setString(6, "address");
-            pstmt.setString(7, "contact_number");
-            pstmt.setDouble(8, 0.0);
+            // Get new user ID and card number
+            String userId = getLatestUserId();
+            long cardNumber = getLatestCardNumber() + 1;
 
-            pstmt.executeUpdate();
+            pstmt.setInt(1, Integer.parseInt(userId));
+            pstmt.setString(2, user.getName());
+            pstmt.setLong(3, cardNumber);    // Use the generated card number
+            pstmt.setString(4, user.getPin());
+            pstmt.setString(5, user.getGender());
+            pstmt.setString(6, user.getAddress());
+            pstmt.setLong(7, Long.parseLong(user.getContactNumber().replaceAll("[^0-9]", ""))); // Convert to number
+            pstmt.setDouble(8, 0.0);  // Initial balance
+
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
 
         } catch (SQLException e) {
+            logger.error("Error saving new user", e);
             throw new RuntimeException(e);
         }
-        return false;
     }
 
     @Override
