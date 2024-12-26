@@ -107,7 +107,7 @@
                 { data: 'transactionDate', title: 'Date/Time' },
                 { data: 'cardNumber', title: 'Card Number' },
                 { data: 'amount', title: 'Amount', render: data => '$' + Number(data).toFixed(2) },
-                { data: 'balanceAfter', title: 'Balance After', render: data => '$' + Number(data).toFixed(2) }
+                { data: 'balanceAfter', title: 'Balance After', render: data => '$' + Number(data).toFixed(2) },
             ];
 
             if (type === 'account') {

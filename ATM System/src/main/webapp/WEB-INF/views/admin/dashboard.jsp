@@ -39,8 +39,8 @@
             </div>
 
             <div class="action-card" onclick="redirectToReport('account')">
-                <h3>Account Report</h3>
-                <p>View account details</p>
+                <h3>Account Management</h3>
+                <p>Manage customer accounts</p>
             </div>
         </div>
     </div>
