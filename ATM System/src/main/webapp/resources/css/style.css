@@ -477,3 +477,27 @@ input {
     margin-bottom: 20px;
 }
 
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.hint {
+    color: #666;
+    font-size: 0.8em;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+input:invalid {
+    border-color: #dc3545;
+}
+
+input:invalid + .hint {
+    color: #dc3545;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}

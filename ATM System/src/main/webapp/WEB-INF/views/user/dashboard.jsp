@@ -54,7 +54,16 @@
                 <form id="transactionForm">
                     <div class="form-group">
                         <label for="amount">Amount</label>
-                        <input type="number" id="amount" name="amount" min="0" step="0.01" required>
+                        <input type="number"
+                               id="amount"
+                               name="amount"
+                               min="0.01"
+                               max="25000"
+                               step="0.01"
+                               required
+                               oninput="validateAmount(this)"
+                        >
+                        <small class="hint">Maximum daily limit: $25,000</small>
                     </div>
 
                     <!-- Extra fields shown only for transfer -->
@@ -105,8 +114,11 @@
 
     // Show the transaction modal and configure the form
     function showTransactionForm(type) {
-        const amount = document.getElementById('amount').value;
-        console.log(`Action:`, type, `Amount:`, amount) // Log for testing
+        // Reset validation states
+        const amountInput = document.getElementById('amount');
+        const toCardInput = document.getElementById('toCard');
+        if (amountInput) amountInput.setCustomValidity('');
+        if (toCardInput) toCardInput.setCustomValidity('');
 
         // Update the modal title based on the action
         modalTitle.textContent = capitalize(type);
@@ -128,16 +140,37 @@
         transactionForm.addEventListener('submit', currentHandler);
     }
 
+    function validateAmount(input) {
+        const amount = parseFloat(input.value);
+        if (amount > 25000) {
+            input.setCustomValidity('Amount cannot exceed $25,000')
+        } else if (amount <= 0) {
+            input.setCustomValidity('Amount must be greater than 0')
+        } else {
+            input.setCustomValidity('')
+        }
+    }
+
+    function validateCardNumber(input) {
+        if (!input.value.match(/^\d{10}$/)) {
+            input.setCustomValidity('Card number must be exactly 10 digits');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+
     function handleTransaction(type) {
-        console.log('Action type: ', type);
+        const amount = parseFloat(document.getElementById('amount').value.trim())
 
-        // Retrieve and validate the amount
-        const amountInput = document.getElementById('amount');
-        const amount = amountInput.value.trim();
-
-        // Validate the amount
-        if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+        // Common amount validation
+        if (!amount || isNaN(amount) || amount <= 0) {
             alert('Please enter a valid amount')
+            return;
+        }
+
+        // Daily limit check ($25000)
+        if (amount > 25000) {
+            alert('Amount exceeds daily transaction limit of $25,000');
             return;
         }
 
@@ -146,19 +179,24 @@
 
         // Additional data for transfer
         if (type === 'transfer') {
-            const toCard = document.getElementById('toCard').value;
-            const description = document.getElementById('description').value;
+            const toCard = document.getElementById('toCard').value.trim();
+            const description = document.getElementById('description').value.trim();
 
-            if (!toCard || !description) {
-                alert('Please fill in all transfer details');
+            // Card number validation
+            if (!toCard || !toCard.match(/^\d{10}$/)) {
+                alert('Please enter a valid 10-digit card number');
+                return;
+            }
+
+            // Description validation
+            if (!description) {
+                alert('Please enter a description for the transfer');
                 return;
             }
             data += "&toCard=" + toCard + "&description=" + description;
         }
 
-        console.log('Sending data:', data);
-
-        // Sending the request to the server
+        // Send the request to the server
         fetch('${pageContext.request.contextPath}/user/transaction', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -177,6 +215,28 @@
                     fetchBalance(); // Refresh the balance
                     closeModal(); // Close the modal
                 } else {
+                    // Handle specific error cases
+                    let errorMessage = 'Transaction failed';
+
+                    switch(data.message) {
+                        case 'Daily transaction limit exceeded':
+                            errorMessage = 'You have reached the maximum number of transactions (5) for today';
+                            break;
+                        case 'Daily deposit limit exceeded':
+                            errorMessage = 'You have reached the daily deposit limit of $25,000';
+                            break;
+                        case 'Daily withdrawal limit exceeded':
+                            errorMessage = 'You have reached the daily withdrawal limit of $25,000';
+                            break;
+                        case 'Insufficient funds':
+                            errorMessage = 'You do not have sufficient funds for this transaction';
+                            break;
+                        case 'Recipient account not found':
+                            errorMessage = 'The recipient card number does not exist';
+                            break;
+                        default:
+                            errorMessage = data.message || 'Transaction failed. Please try again later';
+                    }
                     alert(data.message || 'Transaction failed');
                 }
             })
