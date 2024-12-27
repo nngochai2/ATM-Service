@@ -33,14 +33,14 @@ public class AdminAuthServlet extends BaseServlet {
 
         // Validate input
         if (username == null || password == null) {
-            sendJsonResponse(resp, "{\"success\": false, \"message\": \"Card number and PIN are required\"}");
+            sendJsonResponse(resp, "{\"success\": false, \"message\": \"Username and password are required\"}");
             return;
         }
 
         try {
             if (adminService.authenticate(username, password)) {
                 HttpSession session = req.getSession();
-                session.setAttribute("user", username);
+                session.setAttribute("username", username);
                 sendJsonResponse(resp, "{\"success\": true, \"message\": \"Successfully authenticated\"}");
             } else {
                 sendJsonResponse(resp, "{\"success\": false, \"message\": \"Invalid username or password\"}");
