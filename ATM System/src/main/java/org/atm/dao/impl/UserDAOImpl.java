@@ -3,6 +3,7 @@ package org.atm.dao.impl;
 import org.atm.dao.UserDAO;
 import org.atm.model.User;
 import org.atm.util.DatabaseUtil;
+import org.atm.util.PasswordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +104,8 @@ public class UserDAOImpl implements UserDAO {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return rs.getString("pin").equals(pin);
+                String hashedPin = rs.getString("pin");
+                return PasswordUtil.verifyPassword(pin, hashedPin);
             }
         } catch (SQLException e) {
             logger.error("Error: Wrong PIN number");
@@ -128,6 +130,24 @@ public class UserDAOImpl implements UserDAO {
         return false;
     }
 
+    // @Override
+    //public boolean updatePin(Long cardNumber, String newPin) {
+    //    String sql = "UPDATE users SET pin = ? WHERE card_number = ?";
+    //
+    //    try (Connection conn = DatabaseUtil.getConnection();
+    //         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    //
+    //        String hashedPin = PasswordUtil.hashPin(newPin);  // Hash the new PIN
+    //        pstmt.setString(1, hashedPin);
+    //        pstmt.setLong(2, cardNumber);
+    //
+    //        return pstmt.executeUpdate() > 0;
+    //    } catch (SQLException e) {
+    //        logger.error("Error while updating pin", e);
+    //    }
+    //    return false;
+    //}
+
     @Override
     public boolean updatePin(Long cardNumber, String newPin) {
         String sql = "UPDATE users SET pin = ? WHERE card_number = ?";
@@ -135,7 +155,8 @@ public class UserDAOImpl implements UserDAO {
         try (Connection conn = DatabaseUtil.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, newPin);
+            String hashedPin = PasswordUtil.hashPassword(newPin); // Hash the new PIN
+            pstmt.setString(1, hashedPin);
             pstmt.setLong(2, cardNumber);
 
             return pstmt.executeUpdate() > 0;
@@ -173,11 +194,12 @@ public class UserDAOImpl implements UserDAO {
             // Get new user ID and card number
             String userId = getLatestUserId();
             long cardNumber = getLatestCardNumber() + 1;
+            String hashedPin = PasswordUtil.hashPassword(user.getPin());
 
             pstmt.setInt(1, Integer.parseInt(userId));
             pstmt.setString(2, user.getName());
             pstmt.setLong(3, cardNumber);    // Use the generated card number
-            pstmt.setString(4, user.getPin());
+            pstmt.setString(4, hashedPin);  // Use hashed password
             pstmt.setString(5, user.getGender());
             pstmt.setString(6, user.getAddress());
             pstmt.setLong(7, Long.parseLong(user.getContactNumber().replaceAll("[^0-9]", ""))); // Convert to number
