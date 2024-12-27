@@ -63,7 +63,9 @@
                                required
                                oninput="validateAmount(this)"
                         >
-                        <small class="hint">Maximum daily limit: $25,000</small>
+                        <small class="hint">
+                            Maximum daily limit: $25,000
+                        </small>
                     </div>
 
                     <!-- Extra fields shown only for transfer -->
@@ -93,6 +95,7 @@
     const closeButton = document.querySelector('.close');
     const balance = document.getElementById('balanceAmount');
     let currentHandler = null;
+    let currentBalance = 0;
 
     // Fetch the user's balance on page load
     window.onload = function() {
@@ -103,6 +106,7 @@
         fetch('${pageContext.request.contextPath}/user/balance')
             .then(response => response.json())
             .then(data => {
+                currentBalance = data.balance; // Store the balance
                 document.getElementById('balanceAmount').textContent =
                     '$' + Number(data.balance).toFixed(2);
             })
@@ -140,14 +144,19 @@
         transactionForm.addEventListener('submit', currentHandler);
     }
 
+    // Add dynamic validation to amount input
     function validateAmount(input) {
         const amount = parseFloat(input.value);
+        const type = modalTitle.textContent.toLowerCase();
+
         if (amount > 25000) {
-            input.setCustomValidity('Amount cannot exceed $25,000')
+            input.setCustomValidity('Amount cannot exceed $25,000');
         } else if (amount <= 0) {
-            input.setCustomValidity('Amount must be greater than 0')
+            input.setCustomValidity('Amount must be greater than 0');
+        } else if ((type === 'withdraw' || type === 'transfer') && amount > currentBalance) {
+            input.setCustomValidity(`Amount cannot exceed your current balance`);
         } else {
-            input.setCustomValidity('')
+            input.setCustomValidity('');
         }
     }
 
@@ -177,10 +186,22 @@
         // Initialize the data string
         let data = "action=" + type + "&amount=" + amount;
 
+        // Balance check for withdrawals and transfers
+        if (type === 'withdraw' && amount > currentBalance) {
+            alert('Insufficient funds. Your current balance is not available to proceed this transaction.');
+            return;
+        }
+
         // Additional data for transfer
         if (type === 'transfer') {
             const toCard = document.getElementById('toCard').value.trim();
             const description = document.getElementById('description').value.trim();
+
+            // Balance check for transfers
+            if (amount > currentBalance) {
+                alert('Insufficient funds. Your current balance is not available to proceed this transaction.');
+                return;
+            }
 
             // Card number validation
             if (!toCard || !toCard.match(/^\d{10}$/)) {
