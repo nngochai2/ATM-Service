@@ -64,7 +64,7 @@
                     title: 'Amount ($)',
                     render: function(data, type, row) {
                         const amount = Number(data).toFixed(2);
-                        const colorClass = row.type === 'WITHDRAW' ? 'text-red' : 'text-green';
+                        const colorClass = row.amount < 0 ? 'text-red' : 'text-green';
                         return "<span class='" + colorClass + "'>" + amount + "</span>";
                     }
                 },

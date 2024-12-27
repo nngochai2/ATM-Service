@@ -17,8 +17,8 @@
     <div class="main-content">
         <!-- Welcome Section -->
         <div class="card balance-section">
-            <h3>Welcome Admin</h3>
-            <div id="adminName" class="admin-title">Admin</div>
+            <h2>Welcome Admin</h2>
+<%--            <div id="adminName" class="admin-title">Admin</div>--%>
         </div>
 
         <!-- Report Options -->
@@ -47,21 +47,23 @@
 </div>
 
 <script>
-    <%--// Display Admin's name on load--%>
-    <%--document.addEventListener('DOMContentLoaded', function () {--%>
-    <%--    fetch(`${pageContext.request.contextPath}/admin/name`)--%>
-    <%--        .then(response => {--%>
-    <%--            if (!response.ok) throw new Error('Failed to fetch admin name');--%>
-    <%--            return response.json();--%>
-    <%--        })--%>
+    <%--// Fetch the username on page load--%>
+    <%--window.onload = function () {--%>
+    <%--    fetchUsername();--%>
+    <%--}--%>
+
+    <%--function fetchUsername() {--%>
+    <%--    fetch('${pageContext.request.contextPath}/admin/username')--%>
+    <%--        .then(response => response.json())--%>
     <%--        .then(data => {--%>
-    <%--            document.getElementById('adminName').textContent = data.name || 'Admin';--%>
+    <%--             // Store username--%>
+    <%--            document.getElementById('username').textContent = data.username;--%>
     <%--        })--%>
     <%--        .catch(error => {--%>
     <%--            console.error('Error:', error);--%>
-    <%--            alert('Failed to load admin details');--%>
-    <%--        });--%>
-    <%--});--%>
+    <%--            alert('Error fetching username')--%>
+    <%--        })--%>
+    <%--}--%>
 
     // Redirect to report page based on type
     function redirectToReport(type) {

@@ -11,16 +11,25 @@ import org.atm.dao.impl.UserDAOImpl;
 import org.atm.exception.ATMException;
 import org.atm.service.AdminService;
 import org.atm.service.impl.AdminServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @WebServlet("/admin/auth")
 public class AdminAuthServlet extends BaseServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminAuthServlet.class);
     private AdminService adminService;
 
     @Override
     public void init() throws ServletException {
         adminService = new AdminServiceImpl(new AdminDAOImpl(), new UserDAOImpl(), new TransactionDAOImpl());
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Forward to the login page
+        req.getRequestDispatcher("/WEB-INF/views/admin/login.jsp").forward(req, resp);
     }
 
     @Override
@@ -41,6 +50,8 @@ public class AdminAuthServlet extends BaseServlet {
             if (adminService.authenticate(username, password)) {
                 HttpSession session = req.getSession();
                 session.setAttribute("username", username);
+
+                // Return JSON response
                 sendJsonResponse(resp, "{\"success\": true, \"message\": \"Successfully authenticated\"}");
             } else {
                 sendJsonResponse(resp, "{\"success\": false, \"message\": \"Invalid username or password\"}");
